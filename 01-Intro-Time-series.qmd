@@ -31,6 +31,7 @@ library(tsibble)
 library(tsibbledata)
 library(feasts)
 library(GGally)
+library(ggrepel)
 ```
 
 ## Tidy Data
@@ -120,7 +121,7 @@ heights %>%
   summarise(avg= mean(height),std=sd(height))
 ```
 
-Median rate
+### Median rate
 
 ```{r}
 # let's compute the median murder rate in the four regions of the country:
@@ -141,19 +142,26 @@ sn = map_dbl(c(1,5,10,15,20), compute_s_n)
 # Visualization
 
 ```{r}
+# option to address labels overlap
+options(ggrepel.max.overlaps = Inf)
+
 murders %>% 
-  ggplot(aes(x=population/10^6,y=total,col=region)) +
+  ggplot(aes(x=population / 10^6,y=total,col=region)) +
   geom_point(size=4)+
   geom_text_repel(aes(label=abb))+
   scale_x_log10()+
   scale_y_log10()+
   geom_smooth(method=lm,se=FALSE)+
+  
+  # labels & titles
   labs(x="Populations in millions (log scale)",
        y="Total number of murders (log scale)",
        title = "US Gun Murders in 2010")+
+  
+  # theme
   scale_color_discrete(name = "Region") +
-  facet_wrap(~region)+ 
-  theme_dark()
+  facet_wrap(~region, scales = "free_x")+ 
+  theme_bw()
 ```
 
 # Time Series
