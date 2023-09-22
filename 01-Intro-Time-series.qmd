@@ -99,7 +99,7 @@ avg_sd = heights %>%
 avg_sd
 ```
 
-Let\'s compute the average murder rate of the USA. Recall that the USA murder rate is not the average of the state murder rates.
+Let's compute the average murder rate of the USA. Recall that the USA murder rate is not the average of the state murder rates.
 
 ```{r}
 murders %>%
@@ -191,7 +191,7 @@ z1 = z %>%
 z1
 ```
 
-`tsibble` allows multiple time series to be stored. Let\'s look at the Olympics data set containing the fastest running times for women\'s and men\'s track races from 100m to 10000m. We have a `tsibble` object with:
+`tsibble` allows multiple time series to be stored. Let's look at the Olympics data set containing the fastest running times for women's and men's track races from 100m to 10000m. We have a `tsibble` object with:
 
 -   **\[4y\]** indicates that the interval of these obs. is every 4 years.
 

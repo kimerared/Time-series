@@ -1,0 +1,258 @@
+---
+title: "02-Time-Series-Decomposition"
+author: "Hector Gavilanes"
+format: html
+editor: visual
+self-contained: true
+execute: 
+  warning: false
+  message: false
+---
+
+Plot the data. Inspection of the graph may suggest the possibility of representing the data as follow:
+
+## The classical decomposition
+
+$$
+X_t = m_t + Y_t
+$$
+
+where
+
+-   $m_t$ is the trend component
+
+-   $s_t$ is the seasonal component
+
+-   $Y_t$ random noise component / Residuals
+
+if seasonality and noise fluctuations (variability) appear to increase with the level of the process (trend), then use a preliminary transformation of the data (natural logarithm,...).
+
+We are going to learn how to estimate and eliminate the trend and the seasonal components in the hope that the residual $Y_t$ will be a **stationary time series.**
+
+```{r setup, echo=FALSE}
+# install packages if needed
+#install.packages("itsmr")
+```
+
+```{r, warnings = FALSE, message = FALSE}
+# Load packages
+library(itsmr)
+library(tidyverse)
+library(tsibble)
+library(feasts)
+```
+
+# Trend Estimation
+
+```{r}
+strikes = read.table("http://users.stat.umn.edu/~kb/classes/5932/data/strikes.txt", header = FALSE)
+
+# get data to tsibble format
+strikes = strikes %>% 
+  mutate(Year=seq(1951,1980,1)) %>%
+  as_tsibble(index = Year) 
+
+# plot the time series
+strikes %>%
+  autoplot(V1) + 
+  labs(y="Number of Strikes (thousands)",
+       title="Strikes in USA in 1951-1980")
+```
+
+```{r}
+# plot the ACF
+strikes %>%
+  ACF(V1, lag_max = 20) %>%  
+  autoplot()
+```
+
+# Trend Estimation
+
+## Smoothing Moving Average
+
+```{r}
+strikes %>%
+  mutate(ma.trend3 = smooth.ma(V1, 3),
+         ma.trend5 = smooth.ma(V1, 5),
+         ma.trend7 = smooth.ma(V1, 7),
+         ma.trend9 = smooth.ma(V1, 9)) %>% # q=3 means averaging 2q+1 values
+  pivot_longer(cols =-Year,
+               names_to = "series",
+               values_to = "values") %>%
+    group_by(series) %>%
+    autoplot(values)
+```
+
+# Trend Estimation
+
+## Exponential Smoothing
+
+```{r}
+strikes %>%
+  mutate(exp.trend1 = smooth.exp(V1, 0.1),# alpha=0.1 mis the smootheness parameter
+         exp.trend2 = smooth.exp(V1, 0.5),
+         exp.trend3 = smooth.exp(V1, 0.7),
+         exp.trend4 = smooth.exp(V1, 0.9)) %>% 
+  pivot_longer(cols =-Year,
+               names_to = "series",
+               values_to = "values") %>%
+    group_by(series) %>%
+    autoplot(values)
+```
+
+# Trend Estimation
+
+## FFT
+
+```{r}
+strikes %>%
+  mutate(fft.trend1 = smooth.fft(V1, 0.1),# 0.1 is cutoff frequency - 10% of the lowest spectrum passes
+         fft.trend2 = smooth.fft(V1, 0.25)) %>% 
+  pivot_longer(cols =-Year,
+               names_to = "series",
+               values_to = "values") %>%
+    group_by(series) %>%
+    autoplot(values)
+```
+
+# Trend Estimation 
+
+## Regression
+
+```{r}
+strikes %>%
+  mutate(reg.trend1 = trend(V1, 1),# 1 means polynmial of degree 1 
+         reg.trend2 = trend(V1, 2),
+         reg.trend3 = trend(V1, 3)) %>% 
+  pivot_longer(cols =-Year,
+               names_to = "series",
+               values_to = "values") %>%
+    group_by(series) %>%
+    autoplot(values)
+```
+
+# Seasonality Estimation
+
+```{r}
+plot.ts(deaths)
+```
+
+```{r}
+acf(deaths,lag.max=40)
+```
+
+```{r}
+estimate.season = season(deaths, d=12)
+plotc(deaths,estimate.season)
+```
+
+```{r}
+r = deaths - estimate.season
+test(r)
+```
+
+# Test IID hypothesis for the Residuals
+
+Use the Resid() function to find the residuals.
+
+```{r}
+# deaths
+data.model = c("season",12,"trend",1) # from examining the series
+R= Resid(deaths,data.model)
+# Test IDD
+test(R) # need to tests to fail to reject the null hypothesis
+```
+
+```{r}
+# strikes
+data.model.s = c("trend",3)
+R.s= Resid(strikes$V1,data.model.s)
+# Test IDD
+test(R.s)
+```
+
+# **Trend and Seasonality Elimination using the Differencing operator**
+
+## **Johnson & Johnson quarterly earnings data**
+
+```{r}
+plot.ts(JohnsonJohnson)
+```
+
+```{r}
+acf(JohnsonJohnson,lag.max = 50)
+```
+
+```{r, warnings = FALSE, message = FALSE}
+# Transformation
+library(car)
+L = powerTransform(JohnsonJohnson)
+Tjj = log(JohnsonJohnson)
+
+plot.ts(Tjj)
+```
+
+```{r}
+acf(Tjj,lag.max = 50)
+```
+
+There is a trend with the assumption to be quadratic. There is change in variance.
+
+The data model:
+
+$$
+X_t = m_t + Y_t
+$$
+
+```{r}
+# Estimations
+jj.data.model = c("log","trend",1)
+r.jj = Resid(JohnsonJohnson,jj.data.model)
+test(r.jj)
+```
+
+It seems there is a season of period 4. Then:
+
+$$
+X_t = m_t + S_t + Y_t
+$$
+
+```{r}
+# Estimation 
+jj.data.model = c("log","trend",2,"season",4)
+r.jj = Resid(JohnsonJohnson,jj.data.model)
+test(r.jj)
+```
+
+By elimination we have the following:
+
+$$
+y_t = \nabla^2 \nabla_4log(X_t) 
+$$
+
+The rewrite form:
+
+$$
+y_t = (1-B)^2 (1-B^4)X_t 
+$$
+
+Elimination of season
+
+```{r}
+deseason.data = diff(log(JohnsonJohnson),lag = 4)
+plot(deseason.data)
+```
+
+Trend Elimination
+
+```{r}
+residual.data = diff(deseason.data,lag = 1,differences = 2)
+```
+
+Test IID for Residuals
+
+```{r}
+test(residual.data)
+```
+
+Since at least one test rejects the hypothesis of IID, thus further analysis needs to be performed.
