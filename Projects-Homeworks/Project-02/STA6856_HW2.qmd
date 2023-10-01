@@ -1,0 +1,54 @@
+---
+title: "STA6856 Time Series"
+subtitle: "Assignment 2"
+author: "Student Name"
+date: "today"
+format: html
+self-contained: true
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+# Instructions:
+
+**Submitting the same exact answer will lead to failing the assignment.**
+
+## Problem A
+
+Let $Z_t$ be a sequence of independent normal random variables, each with mean 0 and variance $\sigma^2$, and let $a$, $b$, and $c$ be constants. Which, if any, of the following processes are stationary? for each stationary process specify the mean, autocovariance, and autcorrelations functions.
+
+1.  $X_t = a+ bZ_t + cZ_{t-2}$
+
+2.  $X_t = a+ bZ_0$
+
+## Problem B
+
+Use the following time series:
+
+-   `airpass{itsmr}`: Number of international airline passengers, 1949 to 1960.
+
+-   `lake{itsmr}`: Level of Lake Huron, 1875 to 1972.
+
+And perform the following:
+
+1.  Plot and examine the time series and its ACF.
+
+2.  Estimate the Trend and/or Season being considered using Moving Average Smoothing and Regression, if applicable
+
+3.  Plot both trend estimates and the original series in one figure.
+
+4.  Test the hypothesis whether or not the the residuals data are IID.
+
+5.  State your conclusions whether or not further analysis should be pursued. Why?
+
+6.  Use the differencing operator to eliminate the Trend/Season components and redo steps 4 and 5.
+
+```{r}
+# Load packages
+library(itsmr)
+library(tidyverse)
+library(tsibble)
+library(feasts)
+```
