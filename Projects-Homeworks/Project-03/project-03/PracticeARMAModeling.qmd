@@ -1,0 +1,114 @@
+---
+title: "STA6856 Time Series"
+subtitle: "ARMA modeling"
+author: "Hector Gavilanes"
+format: html
+self-contained: true
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+```{r, warning=FALSE}
+library(tsibble)
+library(tsibbledata)
+library(itsmr)
+library(tidyverse)
+library(feasts)
+library(tseries)
+```
+
+Fit ARMA(p,q) models to the following time series data:
+
+1.  `lake`
+
+2.  `airpass`
+
+Post your work (HTML) on Canvas discussion board.
+
+## MA example
+
+```{r}
+start(lake)
+end(lake)
+lake_ts <- ts(lake, start = 1875, frequency = 1)
+plot.ts(lake)
+
+
+```
+
+```{r}
+acf(lake, lag.max = 40)
+```
+
+```{r}
+# Innovations estimator - MA(q)
+ia(lake, q=1)
+```
+
+## AR example
+
+```{r}
+plot.ts(airpass)
+```
+
+# Airpass
+
+```{r}
+is.ts(airpass)
+# 1949-1960
+air_ts <- ts(airpass, start = c(1949, 1), frequency=12)
+
+# plot time series
+plot.ts(air_ts)
+
+air_tibble <- airpass %>% 
+  as_tibble() %>% 
+  mutate(idx = (1:144), Month= rep(1:12,12), Year= gl(12, k=12, labels = seq(1949, 1960, 1))) %>% 
+  as_tsibble(index=idx)
+
+```
+
+```{r}
+# Plot ACF
+air_tibble %>% 
+  ACF(air_tibble$value, lag_max = 144) %>% 
+  autoplot()
+
+# Plot PACF
+air_tibble %>% 
+  PACF(air_tibble$value, lag_max = 144) %>% 
+  autoplot()
+
+# par(mfrow=c(1,2))
+acf(air_ts, lag.max = 144) #39 + ma
+pacf(air_ts, lag.max = 144) #4 autoregression
+```
+
+```{r}
+# Fit AR model
+arma <- arima(air_ts, order = c(7,0,4))
+print(arma)
+```
+
+```{r}
+tsdiag(arma)
+Box.test(residuals(arma), type = "Ljung-Box")
+```
+
+```{r}
+# plotting the fitted values
+ts.plot(air_ts)
+AR_fit <- air_ts - residuals(arma)
+points(AR_fit, type= "l", col=2, lty=2)
+```
+
+```{r}
+air_additive <- decompose(air_ts)
+plot(air_additive)
+```
+
+```{r}
+adf.test(air_ts, alternative = "stationary")
+```

@@ -85,14 +85,8 @@ library(feasts)
 Load Time Series
 
 ```{r}
-
-lake_data <- LakeHuron
-
-```
-
-```{r}
-LakeHuron
-lake_ts <- ts(LakeHuron, start = 1875, frequency = 1)
+lake_ts <- ts(LakeHuron, start = 1875, frequency = 1) %>% 
+  as_tsibble()
 ```
 
 Plot the series
@@ -103,12 +97,37 @@ plot(airpass, type="o", xlab = "Time", ylab="Passengers",
      main="International Airline Passengers (1949 - 1960)")
 
 # Plot ACF
-acf(airpass, lag=100, col="2", xlab="Lag", ylab="Values", 
+acf(airpass, lag=144, col="2", xlab="Lag", ylab="Values", 
     main="ACF - Airline Passengers")
 
 # Plot PACF
-pacf(airpass, lag=100, col="2", xlab="Lag", ylab="Values", 
+pacf(airpass, lag=144, col="2", xlab="Lag", ylab="Values", 
     main="ACF - Airline Passengers")
+```
+
+2.  MA
+
+```{r}
+ma_smooth <- stats::filter(airpass, sides=2, rep(1/10, 10))
+ma_smooth3 <- stats::filter(airpass, sides=2, rep(1/3, 3))
+ma_smooth5 <- stats::filter(airpass, sides=2, rep(1/5, 5))
+ma_smooth7 <- stats::filter(airpass, sides=2, rep(1/7, 7))
+plot(airpass, col = "black", main = "Airline Passenger with Moving Average Smooth",
+     ylab = "Passengers")
+lines(ma_smooth, col = "magenta")
+lines(ma_smooth3, col = "blue")
+lines(ma_smooth5, col = "orange")
+lines(ma_smooth7, col = "red")
+```
+
+3\.
+
+```{r}
+reg.trend1 = trend(lake_ts, 1) 
+reg.trend2 = trend(lake_ts, 2) 
+reg.trend3 = trend(lake_ts, 3)
+
+plotc(lake_ts, reg.trend1)
 ```
 
 4.  IID test
@@ -164,40 +183,34 @@ Trend using Moving Average Smoothing
 
 ```{r}
 ma_smooth <- stats::filter(lake_ts, sides=2, rep(1/10, 10))
+ma_smooth3 <- stats::filter(lake_ts, sides=2, rep(1/3, 3))
+ma_smooth5 <- stats::filter(lake_ts, sides=2, rep(1/5, 5))
+ma_smooth7 <- stats::filter(lake_ts, sides=2, rep(1/7, 7))
 plot(lake_ts, col = "black", main = "Lake Huron Water Level with Moving Average Smooth",
      ylab = "Water Level")
 lines(ma_smooth, col = "magenta")
+lines(ma_smooth3, col = "blue")
+lines(ma_smooth5, col = "orange")
+lines(ma_smooth7, col = "red")
 ```
 
 ```{r}
-water_level %>% 
-  mutate(ma.trend3 = smooth.ma(value, 3),
-         ma.trend5 = smooth.ma(value, 5))
-pivot_longer(cols = -Year,
-             names_to = "series",
-             values_to = "Values") %>% 
-  group_by(series) %>% 
-  autoplot(values)
+# Estimate the trend using Regression
+trend1 <-trend(lake_ts, 1)
+trend_values <- fitted(trend1)
+lines(time(lake_ts), trend_values, col = "green")
+legend("topright", legend=c("Original", "Moving Average", "Regression Trend"),
+       col=c("blue", "red", "green"), lty=1)
 ```
 
 ```{r}
-# Estimate trend using moving average smoothing
-water_level %>%
-  mutate(ma.trend3 = smooth.ma(value, k = 3),
-         ma.trend5 = smooth.ma(value, k = 5))
-
-# Reshape data for plotting
-water_level_long <- water_level %>%
-  pivot_longer(cols = starts_with("ma.trend"), 
-               names_to = "series", 
-               values_to = "Values")
-
-# Plot the trend estimates
-water_level_long %>%
-  ggplot(aes(x = Year, y = Values, color = series)) +
-  geom_line() +
-  labs(title = "Moving Average Smoothing for Trend Estimation",
-       x = "Year", 
-       y = "Trend Estimate") +
-  theme_minimal()
+lake_ts %>%
+  mutate(reg.trend1 = trend(lake_ts, 1),# 1 means polynmial of degree 1 
+         reg.trend2 = trend(lake_ts, 2),
+         reg.trend3 = trend(lake_ts, 3)) %>% 
+  pivot_longer(cols =-Year,
+               names_to = "series",
+               values_to = "values") %>%
+    group_by(series) %>%
+    autoplot(values)
 ```
