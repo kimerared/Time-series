@@ -1,0 +1,303 @@
+---
+title: "STA6856 Time Series"
+subtitle: "Assignment 2"
+author: "Hector Gavilanes"
+date: "10/10/2023"
+format: html
+self-contained: true
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+# Instructions:
+
+**Submitting the same exact answer will lead to failing the assignment.**
+
+## Problem A
+
+Let $Z_t$ be a sequence of independent normal random variables, each with mean 0 and variance $\sigma^2$, and let $a$, $b$, and $c$ be constants. Which, if any, of the following processes are stationary? for each stationary process specify the mean, autocovariance, and autcorrelations functions.
+
+1.  $X_t = a+ bZ_t + cZ_{t-2}$
+
+2.  $X_t = a+ bZ_0$
+
+## Problem B
+
+Use the following time series:
+
+-   `airpass{itsmr}`: Number of international airline passengers, 1949 to 1960.
+
+-   `lake{itsmr}`: Level of Lake Huron, 1875 to 1972.
+
+And perform the following:
+
+1.  Plot and examine the time series and its ACF.
+
+2.  Estimate the Trend and/or Season being considered using Moving Average Smoothing and Regression, if applicable
+
+3.  Plot both trend estimates and the original series in one figure.
+
+4.  Test the hypothesis whether or not the the residuals data are IID.
+
+5.  State your conclusions whether or not further analysis should be pursued. Why?
+
+6.  Use the differencing operator to eliminate the Trend/Season components and redo steps 4 and 5.
+
+```{r, warning=FALSE}
+# Load packages
+library(itsmr)
+library(tidyverse)
+library(tsibble)
+library(feasts)
+```
+
+# Airpass
+
+```{r}
+#Plot and examine the time series and its ACF.
+is.ts(airpass)
+air_ts = ts(airpass, start = c(1949, 1), end = c(1960, 1), frequency = 12)
+plot.ts(air_ts, main="Number of international airline passengers (1949-1960)", ylab="Pasengers")
+
+# tsibble format
+air_tb = airpass %>% 
+  as_tibble() %>%
+  mutate(idx = seq(yearmonth("1949 Jan"),yearmonth("1960 Dec"),1)) %>%
+  as_tsibble(index=idx)
+
+# autoplot
+air_tb %>%
+  autoplot(value) +
+  labs(x= "Time", y= "Passengers",
+       title="Number of international airline passengers (1949-1960)")
+
+# ACF
+acf(air_ts, lag.max = 144)
+```
+
+```{r}
+#Estimate the Trend and/or Season being considered using Moving Average Smoothing and Regression, if applicable
+air_decompose = decompose(air_ts)
+plot(air_decompose)
+```
+
+From the graph, I can infer the variance seems to be constant, an upward trend, with seasonality.
+
+## Trend Estimation: Smoothing Moving Average
+
+```{r, message=FALSE}
+air_tb %>% 
+  mutate(ma.trend3 = smooth.ma(value, 3),
+         ma.trend30 = smooth.ma(value, 30)) %>% 
+  pivot_longer(cols=-idx,
+               names_to = "series",
+               values_to = "values") %>% 
+  group_by(series) %>% 
+  autoplot(values)+
+  labs(y="Passengers", x="Time", title = "Smoothing Moving Average")
+
+```
+
+## Trend Estimation: Regression
+
+```{r, message=FALSE}
+air_tb %>% 
+  mutate(reg.trend1 = trend(value, 1),# 1 means polynmial of degree 1 
+         reg.trend3 = trend(value, 3)) %>% 
+  pivot_longer(cols=-idx,
+               names_to = "series",
+               values_to = "values") %>% 
+  group_by(series) %>% 
+  autoplot(values)+
+  labs(y="Passengers", x="Time", title = "Regression")
+```
+
+## Seasonality
+
+```{r}
+estimate.season = season(air_tb$value, d=12)
+plotc(air_tb$value, estimate.season)
+```
+
+## IID Hypothesis Test
+
+```{r}
+#Test the hypothesis whether or not the the residuals data are IID.
+r = air_tb$value - estimate.season
+test(r)
+```
+
+```{r}
+# Resid() function to find residuals
+data.model = c("season", 12, "trend", 3)
+R = Resid(air_tb$value, data.model)
+test(R)
+
+```
+
+```{r}
+data.model.s = c("trend",3)
+R.s = Resid(air_tb$value, data.model.s)
+# IDD test
+test(R.s)
+```
+
+```{r}
+data.model.log = c("log", "season", 12, "trend",1)
+R.log = Resid(air_tb$value, data.model.log)
+# IDD test
+test(R.log)
+```
+
+## Conclusion
+
+After performing the IID hypothesis test, I can conclude the following:
+
+Reject $H_0$ at $\alpha = 0.05$. There is sufficient evidence to suggest that the residuals are statistically significant. Thus, the residuals do not comply with the IID hypothesis.
+
+## Differencing Operator to eliminate the Trend/Season components
+
+The Airpass model:
+
+$$
+X_t = m_t + s_t + Y_t
+$$
+
+By Elimination, we have the following:
+
+$$
+y_t = \nabla^1 \nabla_{12} +Y_t
+$$
+
+rewrite this as:
+
+$$
+y_t = (1 - B)^1 (1 - B^{12}) X_t
+$$
+
+```{r}
+deseason.data = diff(log(air_tb$value), lag = 12)
+plot.ts(deseason.data)
+```
+
+```{r}
+# Eliminate Trend - estimate cubic trend
+residual.cubic.data = diff(deseason.data, lag=1, differences = 3)
+# IID test
+test(residual.cubic.data)
+```
+
+## Final Conclusion
+
+Reject the Null Hypothesis of IID; therefore, further analysis needs to be done.
+
+# Lake
+
+```{r}
+#Plot and examine the time series and its ACF.
+is.ts(lake)
+plot.ts(lake, main="Level of Lake Huron (1875-1972)", 
+        ylab="Water Level (ft)")
+
+# ACF
+acf(lake, lag.max = 98)
+
+# tsibble format
+lake_tb = tsibble(year=1875:1972,
+                  index = year,
+                  data= lake)
+# change column names
+colnames(lake_tb) <- c("year", "level")
+
+```
+
+There is no seasonality.
+
+## Trend Estimation: Moving Averages
+
+```{r}
+#Estimate the Trend and/or Season being considered using Moving Average Smoothing and Regression, if applicable
+
+lake_tb %>% 
+  mutate(ma.trend10 = smooth.ma(level, 10),
+         ma.trend30 = smooth.ma(level, 30)) %>% 
+  pivot_longer(cols=-year,
+               names_to = "series",
+               values_to = "level") %>% 
+  group_by(series) %>% 
+  autoplot(level)+
+  labs(y="Water Level", x="Time", title = "Smoothing Moving Average")
+```
+
+## Trend Estimation: Regression
+
+```{r, message=FALSE}
+lake_tb %>% 
+  mutate(reg.trend1 = trend(level, 1),
+         reg.trend2 = trend(level, 2)) %>% 
+  pivot_longer(cols=-year,
+               names_to = "series",
+               values_to = "level") %>% 
+  group_by(series) %>% 
+  autoplot(level)+
+  labs(y="Water Level", x="Time", title = "Regression")
+```
+
+Downward trend.
+
+## Seasonality
+
+```{r}
+estimate.season = season(lake_tb$level, d=1)
+plotc(lake_tb$level, estimate.season)
+```
+
+No seasonality
+
+## IID Hypothesis Test
+
+```{r}
+estimate.trend = trend(lake_tb$level, 2)
+r_lake = lake_tb$level - estimate.trend
+test(r_lake)
+```
+
+```{r}
+# Resid() function to find residuals
+data.model.lake = c("trend", 2)
+R = Resid(lake_tb$level, data.model.lake)
+test(R)
+```
+
+## Conclusion
+
+After performing the IID hypothesis test, I can conclude the following:
+
+Reject $H_0$ at $\alpha = 0.05$. There is sufficient evidence to suggest that the residuals are statistically significant. Thus, the residuals do not comply with the IID hypothesis.
+
+## Differencing Operator to eliminate the Trend/Seasonality
+
+The Lake model:
+
+$$ X_t = m_t + Y_t $$
+
+By Elimination, we have the following:
+
+$$ y_t = \nabla^2 +Y_t $$
+
+rewrite this as:
+
+$$
+y_t = (1 - B)^2 X_t
+$$
+
+```{r}
+# Eliminate Trend - estimate cubic trend
+residual.squared.lake = diff(log(lake_tb$level), lag=1, differences = 2)
+# IID test
+test(residual.squared.lake)
+```
+
+Failed to reject the IID Null Hypothesis at $\alpha = 0.05$. No further analysis is required.
