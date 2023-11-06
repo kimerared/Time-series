@@ -1,0 +1,426 @@
+---
+title: "STA6856 Time Series"
+subtitle: "SARIMA modeling"
+author: "Hector Gavilanes"
+format: html
+self-contained: true
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+```{r}
+# libraries
+library(itsmr)
+library(car)      #power transformation
+library(aTSA)
+library(forecast)
+```
+
+Fit SARIMA(p,d,q)x(P,D,Q) models to the following time series data:
+
+1.  `airpass`
+
+2.  `wine`
+
+Post your work (HTML) on Canvas discussion board.
+
+## Airpass
+
+```{r}
+# plot
+plot.ts(airpass)
+plotc(airpass)
+```
+
+```{r}
+# ACF, PACF
+acf(airpass, lag.max = 50)
+pacf(airpass, lag.max = 40)
+plota(airpass)
+```
+
+## Power Transformation
+
+```{r}
+# Variance change transformation
+lambda = powerTransform(airpass)
+lambda$roundlam
+```
+
+Lambda $\lambda$=0; thus, we can apply Log Power Transformation.
+
+## Differencing Operator
+
+By Elimination, we have the following:
+
+$$
+y_t = \nabla^1 \nabla_{12} +Y_t
+$$
+
+```{r}
+# Eliminate components using Differencing Operator
+air_diff = c("log", "diff", 12, "diff", 1)
+r_diff = Resid(airpass, air_diff)
+test(r_diff)
+```
+
+Reject the IID null hypothesis.
+
+## Test Stationary
+
+```{r}
+adf.test(r_diff)
+```
+
+## SARIMA Model
+
+### Based on the PACF
+
+p = 0,1,2,9,10,11,13
+
+P = 0,1,2
+
+### Based on the ACF
+
+q = 0:40
+
+Q = 0,1,2,3
+
+### Eliminate Trend and Season
+
+d= 1
+
+D = 1
+
+```{r}
+# SARIMA (1,1,1)x(1,1,1)12
+fit1 = arima(airpass,
+             order = c(1,1,1),
+             seasonal = list(order=c(1,1,1), period=12))
+test(fit1$residuals)
+confint(fit1)
+```
+
+### Auto-fit
+
+```{r}
+# Auto fit
+bestmodel = auto.arima(airpass, trace = T, seasonal = T)
+```
+
+```{r}
+test(bestmodel$residuals)
+```
+
+Using the best model (4,1,2) to remove seasonality for stationary models.
+
+```{r}
+# SARIMA (4,1,2)x(1,1,1)12
+fit2 = arima(airpass,
+             order = c(4,1,2),
+             seasonal = list(order=c(1,1,1), period=12))
+test(fit2$residuals)
+confint(fit2)
+```
+
+Failed to reject the null hypothesis. The model is stationary.
+
+```{r}
+# SARIMA (2,1,2)x(1,1,0)12
+fit3 = arima(airpass,
+             order = c(2,1,2),
+             seasonal = list(order=c(1,1,0), period=12))
+test(fit3$residuals)
+confint(fit3)
+```
+
+FTR the null hypothesis. The model is not stationary.
+
+```{r}
+# SARIMA (4,1,2)x(1,1,2)12
+fit4 = arima(airpass,
+             order = c(4,1,2),
+             seasonal = list(order=c(1,1,2), period=12))
+test(fit4$residuals)
+confint(fit4)
+```
+
+FTR the null hypothesis. The model is stationary.
+
+```{r}
+# SARIMA (5,1,2)x(1,1,1)12
+fit5 = arima(airpass,
+             order = c(5,1,2),
+             seasonal = list(order=c(1,1,1), period=12))
+test(fit5$residuals)
+confint(fit5)
+```
+
+```{r}
+# SARIMA (13,1,2)x(1,1,0)12
+fit6 = arima(airpass,
+             order = c(13,1,2),
+             seasonal = list(order=c(1,1,0), period=12))
+test(fit6$residuals)
+confint(fit6)
+```
+
+FTR the null hypothesis. The model is stationary.
+
+## SARIMA Comparison
+
+```{r}
+# Comparison
+AIC.values = c(
+  autoModel = bestmodel$aic,
+  fit1 = fit1$aic,
+  fit2 = fit2$aic,
+  fit3 = fit3$aic,
+  fit4 = fit4$aic,
+  fit5 = fit5$aic,
+  fit6 = fit6$aic
+)
+AIC.values
+```
+
+## SARIMA Equation
+
+The equation of SARIMA (13,1,2)x(1,1,0)12 is:
+
+```{r}
+round(fit2$coef, digits = 3)
+```
+
+$$
+(1-0.357B+0.817B^2+0.229^3-0.110B^4 -0.869^{12})(1-B^{12})(1-B)X_t
+$$
+
+$$
+(1+0.026B-0.974B^2)(1-0.771^{12})Z_t
+$$
+
+$$
+Z_t \sim WN(0,116.9)
+$$
+
+The equation of SARIMA (4,1,2)x(1,1,0)12
+
+```{r}
+round(fit6$coef, digits = 3)
+```
+
+$$
+(1+1.262B -0.172B^2 -0.219^3 -0.080B^4 +0.322B^5 -0.184B^6 -0.165B^7 +0.120B^8 +0.268B^9 -0.499B^{10} + 0.407B^{11} +0.226B^{12} - 0.411B^{13} -0.609^{12}) (1-B^{12}) (1-B) X_t
+$$
+
+$$
+(1-1.679B + 0.700B^2) Z_t
+$$
+
+$$
+Z_t \sim WN(0,97.34)
+$$
+
+# Wine
+
+```{r}
+plotc(wine)
+plot.ts(wine)
+```
+
+```{r}
+# ACF, PACF
+acf(wine, lag.max = 30)
+pacf(wine, lag.max = 30)
+plota(wine)
+```
+
+## Comments on Trend, Seasonality, Variance
+
+The Wine time series has upward trend, seasonality (d=12) based on ACF, and variance change.
+
+The Wine model:
+
+$$
+X_t = m_t + s_t + Y_t
+$$
+
+## Power Transformation
+
+```{r}
+# Variance change transformation
+lambda = powerTransform(wine)
+lambda$roundlam
+```
+
+Lambda $\lambda$ = 0.5; thus, square root transformation needed.
+
+```{r}
+wine <- basicPower(wine, lambda$roundlam)
+```
+
+```{r}
+# Seasonality
+wine_season = season(wine, d=12)
+plotc(wine, wine_season)
+```
+
+## Differencing Operator
+
+By Elimination, we have the following:
+
+$$
+y_t = \nabla_{12} +Y_t
+$$
+
+```{r}
+# Eliminate components using Differencing Operator
+wine_diff = c("diff", 12, "diff", 1)
+wine_r_diff = Resid(wine, wine_diff)
+test(wine_r_diff)
+```
+
+Reject the IID null hypothesis.
+
+## Test Stationary
+
+```{r}
+adf.test(wine_r_diff)
+```
+
+## SARIMA Model
+
+### Based on the PACF
+
+p = 0,1,7,8,9,11,12,13,17
+
+P = 0,1,2
+
+### Based on the ACF
+
+q = 0:5, 7:16, 20:28
+
+Q = 0,1,2
+
+### Eliminate Trend and Season
+
+d= 1
+
+D = 1
+
+```{r}
+# SARIMA (1,1,1)x(1,1,1)12
+wine_fit1 = arima(wine,
+             order = c(1,1,1),
+             seasonal = list(order=c(1,1,1), period=12))
+test(wine_fit1$residuals)
+confint(wine_fit1)
+```
+
+FTR the null hypothesis. The model is stationary.
+
+### Auto-Fit
+
+```{r}
+# Auto fit
+wine_bestmodel = auto.arima(wine, trace = T, seasonal = T)
+```
+
+```{r}
+test(wine_bestmodel$residuals)
+```
+
+Using the best model (1,1,1) to remove seasonality for stationary models.
+
+```{r}
+# SARIMA (1,1,1)x(1,1,2)12
+wine_fit2 = arima(wine,
+             order = c(1,1,1),
+             seasonal = list(order=c(1,1,2), period=12))
+test(wine_fit2$residuals)
+confint(wine_fit2)
+```
+
+FTR the null hypothesis. The time series model is stationary.
+
+```{r}
+# SARIMA (1,1,1)x(0,1,1)12
+wine_fit3 = arima(wine,
+             order = c(1,1,1),
+             seasonal = list(order=c(0,1,1), period=12))
+test(wine_fit3$residuals)
+confint(wine_fit3)
+```
+
+FTR the null hypothesis. The time series model is stationary.
+
+```{r}
+# SARIMA (1,1,1)x(1,1,0)12
+wine_fit4 = arima(wine,
+             order = c(1,1,1),
+             seasonal = list(order=c(1,1,0), period=12))
+test(wine_fit4$residuals)
+confint(wine_fit4)
+```
+
+FTR the null hypothesis. The time series model is stationary.
+
+```{r}
+# SARIMA (1,1,1)x(0,1,2)12
+wine_fit5 = arima(wine,
+             order = c(1,1,1),
+             seasonal = list(order=c(0,1,2), period=12))
+test(wine_fit5$residuals)
+confint(wine_fit5)
+```
+
+FTR the null hypothesis. The time series model is stationary.
+
+## SARIMA Comparison
+
+```{r}
+# Comparison
+AIC.values = c(
+  autoModel = bestmodel$aic,
+  wine_fit1 = wine_fit1$aic,
+  wine_fit2 = wine_fit2$aic,
+  wine_fit3 = wine_fit3$aic,
+  wine_fit4 = wine_fit4$aic,
+  wine_fit5 = wine_fit5$aic
+)
+AIC.values
+```
+
+## SARIMA Equation
+
+```{r}
+round(coefficients(wine_fit3), digits = 3)
+```
+
+$$
+(1+0.094B)(1-B^{12})(1-B)X_t
+$$
+
+$$
+(1-0.847B)(1-0.681B^{12})Z_t
+$$
+
+$$
+Z_t \sim WN(0,5.079)
+$$
+
+Another way to write the equation:
+
+$$
+\phi(B)\Phi(B^{12}) (1-B^{12}) (1-B) X_t = \theta(B)\Theta(B^{12}) Z_t \quad Z_t \sim WN(0, \sigma^2)
+$$
+
+$$
+\phi=0.094, \quad \theta=-0.847, \quad \Phi=0, \quad \Theta = -0.681
+$$
+
+$$
+Z_t \sim WN(0,5.079)
+$$

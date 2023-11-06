@@ -1,0 +1,3 @@
+When data has no trend nor Season-> ARMA
+When data has only trend-> ARIMA
+When Data has both Trend and Season -> SARIMA

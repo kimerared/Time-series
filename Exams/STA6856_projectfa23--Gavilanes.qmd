@@ -1,0 +1,249 @@
+---
+title: "STA6856 Time Series"
+subtitle: "Midterm Project"
+author: "Hector Gavilanes"
+format: html
+self-contained: true
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+## Instructions:
+
+The take-home project exam will involve analyzing time series data. You are allowed to use your notes, the lectures notes, and anything you find in the library or online, if that is properly acknowledged, but all your work must be your own. **Complete this examination honestly, without giving assistance to anyone or receiving it from anyone.**
+
+> UWF Student Code of Academic Conduct: As Argonauts, we act with integrity. We do not lie, cheat, steal, or tolerate those who do.
+>
+> I understand that a breach of the UWF Student Code of Academic Conduct will result in disciplinary action, including failing the exam and the course.  
+>
+> Student Initials: HG
+
+-   Failing to submit HTML and QMD files separately will result in failing the exam.
+
+# Exam
+
+```{r, warning=FALSE}
+#install.packages("astsa")
+# Load packages
+library(itsmr)
+library(tidyverse)
+library(tsibble)
+library(feasts)
+library(car)
+library(astsa)
+```
+
+## Problem A: Application of ACVF and ACF
+
+Let's consider the moving average model MA(1):
+
+$$
+X_t = \theta Z_{t-1} + Z_t; Z_t \sim WN(0,1)
+$$
+
+1.  Find the autocovariance function -ACVF- of MA(1)
+
+2.  Find the autocorrelation function -ACF- of MA(1)
+
+3.  Assume $\theta=0.47$ compute the ACVF and ACF.
+
+## Problem B: Application of CI
+
+Consider $X_t$ is a time series AR(1) with $\phi=0.5$ and $\sigma_{Z_t}=2$. Let's assume we have a sample $\{X_1,\dots,X_{50}\}$. The sample mean is 1.5 and $\hat{\rho}(1)$ (ACF at lag 1) is equal to $0.63$.
+
+The approximate $95\%$ confidence interval for the mean of AR(1) process is given by:
+
+$$
+ \overline{X}_n \pm 1.96 \frac{\sigma_{Z_t}}{\sqrt{n}(1-\phi)} 
+$$
+
+1.  Compute the approximate $95\%$ confidence interval for the process mean $\mu_{X_t}$.
+
+2.  Are the data compatible with the hypothesis that $\mu=0$?
+
+The approximate $95\%$ confidence interval for the autocorrelation coefficient at Lag 1, $\rho(1)$, of AR(1) process is given by:
+
+$$
+\hat{\rho}(1) \pm 1.96 \sqrt{\frac{w_{11}}{n} }
+$$
+
+where $w_{ii}$ for AR(1) is given by:
+
+$$
+w_{ii}=\frac{(1-\phi^{2i})(1+\phi^2)}{1-\phi^2} - 2i\phi^{2i}, \quad i=1,2, \dots
+$$
+
+1.  Compute the approximate $95\%$ confidence interval for the autocorrelation coefficient at Lag 1, $\rho(1)$.
+
+2.  Assume we observed $X_{50}=10$. Find the best linear predictor of $X_{52}$
+
+## Problem C: ARMA(p,q) Modeling
+
+In this problem we will find an ARMA(p,q) model to the Monthly price of a pound of chicken, US cents per pound. `chicken{astsa}`. Follow these steps:
+
+1.  Plot and examine the series and its ACF. Comment.
+
+    ```{r}
+    plotc(chicken)
+
+    # Plot ACF and PACF
+    plota(chicken)
+    ```
+
+    The time series has an upward trend, it appears not to have seasonality, and the variance appears to change from high to low volatility.
+
+2.  State a data model (components of series observed).
+
+    $$
+    X_t = m_t + Y_t
+    $$
+
+    To deal with the variance change, we need to perform a transformation.
+
+    ```{r}
+    lambda = powerTransform(chicken)
+    lambda$roundlam
+    ```
+
+    The transformation is going to be log() since lambda = 0.
+
+3.  Estimate and Eliminate the components, name the resulting residuals $r1$ (you pick a technique to estimate).
+
+    ```{r}
+    m = smooth.ma(chicken, 1) # moving average filter
+    mreg = trend(chicken, 1) # polynomial regression
+    plot(chicken, type = "l")
+
+    # Find residuals
+    plotc(log(chicken))
+    # data model
+    chick_model = c("log", "trend", 1)
+    r1 = Resid(chicken, chick_model)
+    ```
+
+4.  Eliminate the components using the differencing operator $\nabla$, name the resulting $r2$.
+
+    $$
+    y_t = \nabla^1 + Y_t
+    $$
+
+    ```{r}
+    # Eliminate components using Differencing Operator
+    chick_diff = c("log", "diff", 1)
+    r2 = Resid(chicken, chick_diff)
+
+    ```
+
+5.  Examine the ACF of $r2$. Comment and consider changing your data model, if needed? If you decide to change your data model, then recompute $r1$ and $r2$.
+
+    ```{r}
+    plota(r2)
+    ```
+
+    The ACF still has some significant values showing on the graph. Thus, the model is not stationary. I will modify the first model.
+
+    ## Second Model
+
+    In this case, I will not make any data transformation since I assume that there is no variance change. However, this model is even worse than the first one.
+
+    ```{r}
+    # data model
+    chick_model = c("trend", 1)
+    r3 = Resid(chicken, chick_model)
+
+    # Eliminate components using Differencing Operator
+    chick_diff = c("diff", 1)
+    r4 = Resid(chicken, chick_diff)
+    ```
+
+6.  Test IID hypothesis for the residuals $r1$ and $r2$. Comment.
+
+    ```{r}
+    # r1 IID test
+    test(r1)
+    # r2 IID Test
+    test(r2)
+    ```
+
+    ```{r}
+    # r1 IID test
+    test(r3)
+    # r2 IID Test
+    test(r4)
+    ```
+
+    After performing the IID hypothesis test, I can conclude the following:
+
+    Reject $H_0$ at $\alpha = 0.05$. There is sufficient evidence to suggest that the residuals are statistically significant. Thus, the residuals do not comply with the IID hypothesis.
+
+    Further analysis needs to be performed.
+
+7.  If the IID hypothesis is rejected, then fit an ARMA(p,q) model to either residuals of your choice.
+
+    p=0,1,6,9,12
+
+    q=0,1,2...
+
+    ```{r}
+    pacf(r2)
+    acf(r2)
+
+    ```
+
+8.  Present at least 3 models with AIC and IID testing.
+
+    ## Model-01
+
+    $$
+    Y_t = 0.72Y_{t-1} + Z_t
+    $$
+
+    AICC = -1188.15
+
+    Reject the IID hypothesis for model 1.
+
+    ```{r}
+    model_1=arma(r2, p=1, q=0)
+    arma_model_01 = specify(ar=model_1$phi, ma = model_1$theta, sigma2 = model_1$sigma2)
+
+    arma_resid_01 = Resid(r2, M= NULL, a=arma_model_01)
+    test(arma_resid_01)
+
+    ```
+
+    ## Model-02
+
+    $$
+    Y_t = 0.61Y_{t-1} + 0.29Z_{t-1} + Z_t
+    $$
+
+    AICC = -119.62
+
+    ```{r}
+    model_2=arma(r2, p=1, q=1)
+    arma_model_02 = specify(ar=model_2$phi, ma = model_2$theta, sigma2 = model_2$sigma2)
+
+    arma_resid_02 = Resid(r2, M= NULL, a=arma_model_02)
+    test(arma_resid_02)
+    ```
+
+    ## Model-03
+
+    ```{r}
+    model_3=arma(r2, p=6, q=2)
+    ```
+
+9.  Provide the final equation of the best adequate model.
+
+```{r}
+modelbest = autofit(r2, p=0:2, q=0:12)
+
+arma_model = specify(ar=modelbest$phi, ma = modelbest$theta, sigma2 = modelbest$sigma2)
+
+arma_resid = Resid(r2, M= NULL, a=arma_model)
+test(r2)
+```
+
+I was not able to find a good model. Need more time for further analysis.
