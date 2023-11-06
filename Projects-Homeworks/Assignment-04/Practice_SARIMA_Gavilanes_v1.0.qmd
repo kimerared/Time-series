@@ -26,6 +26,10 @@ Fit SARIMA(p,d,q)x(P,D,Q) models to the following time series data:
 
 Post your work (HTML) on Canvas discussion board.
 
+$$
+\phi(B)\Phi(B^s)(1-B^s)^D(1-B)^d X_t = \theta(B)\Theta(B^s) Z_t, \quad Z_t \sim WN(0,\sigma^2)
+$$
+
 ## Airpass
 
 ```{r}
