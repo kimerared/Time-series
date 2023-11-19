@@ -1,10 +1,12 @@
 ---
-title: "ARMA errors"
+title: "ARMA Errors"
 author: "Hector Gavilanes"
-format:
-  format: "html""
-  embed-resources: true
-editor: visual
+format: html
+embed-resources: true
+editor: "visual"
+execute: 
+  warning: false
+  message: false
 ---
 
 ## Regression with ARMA errors
