@@ -1,0 +1,103 @@
+---
+title: "ARMA errors"
+author: "Hector Gavilanes"
+format:
+  format: "html""
+  embed-resources: true
+editor: visual
+---
+
+## Regression with ARMA errors
+
+The regression model is given by:
+
+$$
+Y_t = \beta_{0t} + \beta_{1t}X_{1t} + ... + \beta_{pt}X_{pt} + \epsilon_t
+$$
+
+where $\epsilon_t$ is an ARMA(p,q) time series model:
+
+$$
+\phi(B)\epsilon_t = \theta(B)Z_t
+$$
+
+$Z_t$ is white noise.
+
+## US Change Data
+
+Daily air quality measurements in New York, May to September 1973.
+
+```{r}
+library(itsmr)
+library(astsa)
+library(forecast)
+library(fpp3)
+
+autoplot(us_change,Consumption) +
+  xlab("Year") + ylab("") + 
+  ggtitle("Quarterly changes in US consumption")
+```
+
+```{r}
+autoplot(us_change,Income) +
+  xlab("Year") + ylab("") + 
+  ggtitle("Quarterly changes in US Personal Income")
+```
+
+```{r}
+fit = auto.arima(us_change$Consumption, 
+                 xreg=us_change$Income)
+fit
+```
+
+## Type of Residuals
+
+```{r}
+## regression residuals
+test(residuals(fit,type="regression"))
+```
+
+```{r}
+## ARMA residuals -innovation-
+test(residuals(fit,type="innovation"))
+```
+
+## Air Quality Data
+
+```{r}
+summary(airquality)
+```
+
+```{r}
+fit.temp = auto.arima(y = airquality$Temp, 
+                      xreg = cbind(airquality$Wind,airquality$Ozone))
+fit.temp
+```
+
+The equation
+
+$$
+y_t = -0.13Wind + 0.072Ozone + \epsilon_t
+$$
+
+where
+
+$$
+(1+0.58B + 0.28B^2)(1-B)\epsilon_t = 0.023 + Z_t
+$$
+
+## Lake Data
+
+```{r}
+plot(lake, type = "o")
+```
+
+```{r}
+t = 1:98
+fit.lake = auto.arima(lake, xreg = t)
+fit.lake
+```
+
+```{r}
+test(residuals(fit.lake,"innovation"))
+```

@@ -1,0 +1,323 @@
+---
+title: "Hector Gavilanes"
+format: html
+editor: visual
+---
+
+## Forecasting using the following:
+
+-   ARAR algorithm for forecasting
+
+-   Holt- Winters exponential smoothing algorithm
+
+-   SARIMA models for forecasting
+
+## Chicken Data
+
+```{r, warning=FALSE, message=FALSE}
+#libraries
+library(car)
+library(ltsa)
+library(itsmr)
+library(astsa)
+library(itsmr)
+library(forecast)
+```
+
+```{r}
+# plot
+plot(chicken)
+```
+
+```{r}
+# ACF plot
+acf(chicken,lag.max = 100)
+```
+
+```{r}
+# data model
+M=c("diff",1,"diff",12)
+r = Resid(chicken,M)
+test(r)
+```
+
+## Stationary Test
+
+```{r, warning=FALSE, message=FALSE}
+# Augmented Dickey-Fuller Test
+# H0: X_t is a non-stationary time series
+# H1: X_t is a stationary time series
+
+library(aTSA)
+adf.test(r)
+```
+
+No differencing is needed.
+
+```{r}
+
+```
+
+## SARIMA Models
+
+```{r}
+# Potential Values
+# based on the PACF
+# p = 0, 1, 2
+# P = 0, 1, 2
+# based on the ACF
+# q = 0, 1, 2, 3, 9, 10, 11
+# Q = 0, 1, 2,
+# Eliminate Trend and Season
+# d = 1
+# D = 1
+
+# SARIMA (1,1,1)x(1,1,1)12
+fit1 = arima(chicken,
+            order = c(1,1,1),
+            seasonal = list(order=c(1,1,1),period=12))
+test(fit1$residuals)
+confint(fit1)
+```
+
+```{r}
+# SARIMA (1,1,1)x(2,1,1)12
+fit2 = arima(chicken,
+            order = c(1,1,1),
+            seasonal = list(order=c(2,1,1),period=12))
+test(fit2$residuals)
+confint(fit2)
+```
+
+### AutoFit
+
+```{r}
+# Auto fit
+bestmodel = auto.arima(chicken, trace= TRUE)
+```
+
+```{r}
+test(bestmodel$residuals)
+```
+
+```{r}
+# SARIMA (2,1,1)x(0,1,1)12
+fit3 = arima(chicken,
+            order = c(2,1,1),
+            seasonal = list(order=c(0,1,1),period=12))
+test(fit3$residuals)
+confint(fit3)
+```
+
+```{r}
+# SARIMA (1,1,1)x(0,1,1)12
+fit4 = arima(chicken,
+            order = c(1,1,1),
+            seasonal = list(order=c(0,1,1),period=12))
+test(fit4$residuals)
+confint(fit4)
+```
+
+```{r}
+# SARIMA (1,1,0)x(0,1,1)12
+fit5 = arima(chicken,
+            order = c(1,1,0),
+            seasonal = list(order=c(0,1,1),period=12))
+test(fit5$residuals)
+confint(fit5)
+```
+
+Fit 5 is not stationary. It will not be used.
+
+## Models Comparison
+
+```{r}
+## Compare
+AIC.values = c(
+      AutoModel = bestmodel$aic,
+       fit1 = fit1$aic,
+       fit2 = fit2$aic,
+       fit3 = fit3$aic,
+       fit4 = fit4$aic
+      )
+AIC.values
+```
+
+The SARIMA equation for (2,1,1)x(0,1,1)12 is:
+
+$$
+(1-0.861B+0.195B^2)(1-B)(1-B^{12})X_t = (1+0.021B)(1-0.886B^{12})Z_t
+$$
+
+$$
+Z_t \sim WN(0,0.329)
+$$
+
+# Forecating with Time Series
+
+```{r}
+chicken_train = chicken[1:170]
+
+
+# SARIMA (1,1,1)x(1,1,1)12
+fit1 = arima(chicken_train,
+            order = c(1,1,1),
+            seasonal = list(order=c(1,1,1),period=12))
+
+# SARIMA (1,1,1)x(2,1,1)12
+fit2 = arima(chicken_train,
+            order = c(1,1,1),
+            seasonal = list(order=c(2,1,1),period=12))
+
+# Auto fit
+bestmodel = auto.arima(chicken_train, trace= TRUE)
+```
+
+```{r}
+bestmodel = arima(chicken_train, order = c(2,1,1))
+# SARIMA (2,1,1)x(0,1,1)12
+fit3 = arima(chicken_train,
+            order = c(2,1,1),
+            seasonal = list(order=c(0,1,1),period=12))
+
+# SARIMA (1,1,1)x(0,1,1)12
+fit4 = arima(chicken_train,
+            order = c(1,1,1),
+            seasonal = list(order=c(0,1,1),period=12))
+
+# SARIMA (1,1,0)x(0,1,1)12
+fit5 = arima(chicken_train,
+            order = c(1,1,0),
+            seasonal = list(order=c(0,1,1),period=12))
+```
+
+## Using Forecast Function
+
+```{r}
+f1 = aTSA::forecast(object = fit1,lead = 10,output = FALSE)
+f2 = aTSA::forecast(object = fit2,lead = 10,output = FALSE)
+f3 = aTSA::forecast(object = fit3,lead = 10,output = FALSE)
+f4 = aTSA::forecast(object = fit4,lead = 10,output = FALSE)
+f5 = aTSA::forecast(object = fit5,lead = 10,output = FALSE)
+f.auto = aTSA::forecast(object = bestmodel,lead = 10,output = FALSE)
+```
+
+## ARAR Algorithm for Forecasting
+
+```{r}
+arar.prd = arar(chicken_train, h=10)
+```
+
+```{r}
+HWmodel = HoltWinters(ts(chicken_train,start=1,frequency = 12),seasonal = "mult")
+HW.prd =forecast::forecast(HWmodel,10)
+```
+
+### Forecasting Performance Evaluation
+
+```{r, warning=FALSE, message=FALSE}
+library(Metrics)
+MAPE1 = mape(chicken[171:180],f1[,2])*100
+MAPE2 = mape(chicken[171:180],f2[,2])*100
+MAPE3 = mape(chicken[171:180],f3[,2])*100
+MAPE4 = mape(chicken[171:180],f4[,2])*100
+MAPE5 = mape(chicken[171:180],f5[,2])*100
+MAPEauto = mape(chicken[171:180],f.auto[,2])*100
+MAPEarar = mape(chicken[171:180],arar.prd$pred)*100
+MAPEhw = mape(chicken[171:180],HW.prd$mean)*100
+
+
+MAPEs = c(fit1_mape = MAPE1,
+          fit2_mape = MAPE2,
+          fit3_mape = MAPE3,
+          fit4_mape = MAPE4,
+          fit5_mape = MAPE5,
+          fitauto_mape = MAPEauto,
+          arar.model = MAPEarar,
+          hw.model = MAPEhw)
+MAPEs
+```
+
+# US Employment Data
+
+```{r, warning=FALSE, message=FALSE}
+library(fpp3)
+
+us_empl = us_employment %>% 
+  filter(year(Month)>2009, Title=="All Employees, Total Nonfarm") %>%
+  select(-Series_ID)
+ 
+us_empl %>% 
+  autoplot(Employed)
+```
+
+```{r}
+auto.arima(us_empl$Employed)
+```
+
+```{r}
+empl_data = us_empl$Employed
+
+acf(empl_data,lag.max = 100)
+```
+
+```{r}
+M = c("diff",1,"diff",12)
+r = Resid(empl_data,M)
+test(r)
+```
+
+```{r}
+p = c(0,1,6,11)
+P = c(0,1)
+q = c(0,1,11)
+Q = c(0,1)
+
+all = expand_grid(p,P,q,Q)
+
+# this function fit a SARIM model, forecast, and calculate the mape
+fit = function(x,p,d,q,P,D,Q,s,h){
+# x train
+x_train = x[1:I(length(x)-h)]  
+# fit the model
+ft = arima(x_train, 
+           order = c(p,d,q) ,
+          seasonal = list(order=c(P,D,Q),period=s))
+# predict the h ahead point using SARIMA
+prd = predict(ft,h)$pred[1:h]
+
+# fit and predict using Holt-Winters
+HWmodel = HoltWinters(ts(x_train,start=1,frequency = s),seasonal = "mult")
+prdhw = forecast::forecast(HWmodel,h)
+
+# fit and predict using ARAR
+prdarar = arar(x_train,h,opt=0)
+
+# actual data
+actual = x[I(length(x)-h+1):length(x)]
+# return the mape
+return(c(sarima=100*mape(actual,prd),
+         arar = 100*mape(actual,prdarar$pred),
+         hw = 100*mape(actual,prdhw$mean)))
+}
+
+
+```
+
+```{r}
+fit(chicken,1,1,1,1,1,1,12,10)
+fit(chicken,1,1,1,2,1,1,12,10)
+fit(chicken,2,1,1,0,1,1,12,10)
+fit(chicken,1,1,1,0,1,1,12,10)
+fit(chicken,1,1,0,0,1,1,12,10)
+fit(us_empl$Employed,1,1,1,1,1,1,12,12)
+fit(us_empl$Employed,1,1,1,1,1,0,12,5)
+
+```
+
+## Using SARIMA function for different Datasets
+
+```{r}
+fit(wine,1,1,1,1,1,0,12,5)
+fit(AirPassengers,1,1,1,1,1,0,12,5)
+```

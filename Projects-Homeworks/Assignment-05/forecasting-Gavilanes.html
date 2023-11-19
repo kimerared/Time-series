@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Hector Gavilanes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="forecasting-Gavilanes_files/libs/clipboard/clipboard.min.js"></script>
+<script src="forecasting-Gavilanes_files/libs/quarto-html/quarto.js"></script>
+<script src="forecasting-Gavilanes_files/libs/quarto-html/popper.min.js"></script>
+<script src="forecasting-Gavilanes_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="forecasting-Gavilanes_files/libs/quarto-html/anchor.min.js"></script>
+<link href="forecasting-Gavilanes_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="forecasting-Gavilanes_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="forecasting-Gavilanes_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="forecasting-Gavilanes_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="forecasting-Gavilanes_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Hector Gavilanes</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="forecasting-using-the-following" class="level2">
+<h2 class="anchored" data-anchor-id="forecasting-using-the-following">Forecasting using the following:</h2>
+<ul>
+<li><p>ARAR algorithm for forecasting</p></li>
+<li><p>Holt- Winters exponential smoothing algorithm</p></li>
+<li><p>SARIMA models for forecasting</p></li>
+</ul>
+</section>
+<section id="chicken-data" class="level2">
+<h2 class="anchored" data-anchor-id="chicken-data">Chicken Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#libraries</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ltsa)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(itsmr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(astsa)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(itsmr)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forecast)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(chicken)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ACF plot</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(chicken,<span class="at">lag.max =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># data model</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>M<span class="ot">=</span><span class="fu">c</span>(<span class="st">"diff"</span>,<span class="dv">1</span>,<span class="st">"diff"</span>,<span class="dv">12</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>r <span class="ot">=</span> <span class="fu">Resid</span>(chicken,M)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(r)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Null hypothesis: Residuals are iid noise.
+Test                        Distribution Statistic   p-value
+Ljung-Box Q                Q ~ chisq(20)    236.56         0 *
+McLeod-Li Q                Q ~ chisq(20)     69.81         0 *
+Turning points T    (T-110)/5.4 ~ N(0,1)        85         0 *
+Diff signs S         (S-83)/3.7 ~ N(0,1)        89    0.1088
+Rank P         (P-6930.5)/361.3 ~ N(0,1)      6323    0.0927</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="stationary-test" class="level2">
+<h2 class="anchored" data-anchor-id="stationary-test">Stationary Test</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Augmented Dickey-Fuller Test</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># H0: X_t is a non-stationary time series</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># H1: X_t is a stationary time series</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(aTSA)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(r)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Augmented Dickey-Fuller Test 
+alternative: stationary 
+ 
+Type 1: no drift no trend 
+     lag   ADF p.value
+[1,]   0 -5.00    0.01
+[2,]   1 -5.54    0.01
+[3,]   2 -5.42    0.01
+[4,]   3 -4.45    0.01
+[5,]   4 -4.15    0.01
+Type 2: with drift no trend 
+     lag   ADF p.value
+[1,]   0 -4.98    0.01
+[2,]   1 -5.53    0.01
+[3,]   2 -5.41    0.01
+[4,]   3 -4.43    0.01
+[5,]   4 -4.14    0.01
+Type 3: with drift and trend 
+     lag   ADF p.value
+[1,]   0 -5.03    0.01
+[2,]   1 -5.58    0.01
+[3,]   2 -5.46    0.01
+[4,]   3 -4.47    0.01
+[5,]   4 -4.17    0.01
+---- 
+Note: in fact, p.value = 0.01 means p.value &lt;= 0.01 </code></pre>
+</div>
+</div>
+<p>No differencing is needed.</p>
+</section>
+<section id="sarima-models" class="level2">
+<h2 class="anchored" data-anchor-id="sarima-models">SARIMA Models</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Potential Values</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># based on the PACF</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># p = 0, 1, 2</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># P = 0, 1, 2</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># based on the ACF</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># q = 0, 1, 2, 3, 9, 10, 11</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Q = 0, 1, 2,</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Eliminate Trend and Season</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># d = 1</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># D = 1</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(1,1,1)12</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">=</span> <span class="fu">arima</span>(chicken,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(fit1<span class="sc">$</span>residuals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Null hypothesis: Residuals are iid noise.
+Test                        Distribution Statistic   p-value
+Ljung-Box Q                Q ~ chisq(20)     26.41    0.1526
+McLeod-Li Q                Q ~ chisq(20)     26.03     0.165
+Turning points T  (T-118.7)/5.6 ~ N(0,1)       113     0.314
+Diff signs S       (S-89.5)/3.9 ~ N(0,1)        90    0.8976
+Rank P           (P-8055)/404.2 ~ N(0,1)      7885     0.674</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(fit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           2.5 %     97.5 %
+ar1   0.46878995  0.7763438
+ma1   0.06514557  0.4192904
+sar1 -0.16334103  0.2108869
+sma1 -1.09510886 -0.6989799</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(2,1,1)12</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>fit2 <span class="ot">=</span> <span class="fu">arima</span>(chicken,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(fit2<span class="sc">$</span>residuals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Null hypothesis: Residuals are iid noise.
+Test                        Distribution Statistic   p-value
+Ljung-Box Q                Q ~ chisq(20)     24.24    0.2322
+McLeod-Li Q                Q ~ chisq(20)     25.54    0.1816
+Turning points T  (T-118.7)/5.6 ~ N(0,1)       115    0.5147
+Diff signs S       (S-89.5)/3.9 ~ N(0,1)        92    0.5198
+Rank P           (P-8055)/404.2 ~ N(0,1)      7864    0.6365</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(fit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           2.5 %      97.5 %
+ar1   0.45832025  0.77089400
+ma1   0.04960548  0.40221488
+sar1 -0.28700520  0.10441249
+sar2 -0.41013308 -0.05367367
+sma1 -0.93736536 -0.59307991</code></pre>
+</div>
+</div>
+<section id="autofit" class="level3">
+<h3 class="anchored" data-anchor-id="autofit">AutoFit</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto fit</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>bestmodel <span class="ot">=</span> <span class="fu">auto.arima</span>(chicken, <span class="at">trace=</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Fitting models using approximations to speed things up...
+
+ ARIMA(2,1,2)(1,0,1)[12] with drift         : Inf
+ ARIMA(0,1,0)            with drift         : 512.1327
+ ARIMA(1,1,0)(1,0,0)[12] with drift         : 357.8553
+ ARIMA(0,1,1)(0,0,1)[12] with drift         : 399.0111
+ ARIMA(0,1,0)                               : 521.4674
+ ARIMA(1,1,0)            with drift         : 380.5252
+ ARIMA(1,1,0)(2,0,0)[12] with drift         : 361.1736
+ ARIMA(1,1,0)(1,0,1)[12] with drift         : Inf
+ ARIMA(1,1,0)(0,0,1)[12] with drift         : 361.7262
+ ARIMA(1,1,0)(2,0,1)[12] with drift         : Inf
+ ARIMA(0,1,0)(1,0,0)[12] with drift         : 496.251
+ ARIMA(2,1,0)(1,0,0)[12] with drift         : 349.6098
+ ARIMA(2,1,0)            with drift         : 361.2204
+ ARIMA(2,1,0)(2,0,0)[12] with drift         : 352.9452
+ ARIMA(2,1,0)(1,0,1)[12] with drift         : Inf
+ ARIMA(2,1,0)(0,0,1)[12] with drift         : 347.5637
+ ARIMA(2,1,0)(0,0,2)[12] with drift         : 348.8669
+ ARIMA(2,1,0)(1,0,2)[12] with drift         : Inf
+ ARIMA(3,1,0)(0,0,1)[12] with drift         : 346.8076
+ ARIMA(3,1,0)            with drift         : 359.6763
+ ARIMA(3,1,0)(1,0,1)[12] with drift         : Inf
+ ARIMA(3,1,0)(0,0,2)[12] with drift         : 348.5706
+ ARIMA(3,1,0)(1,0,0)[12] with drift         : 350.3946
+ ARIMA(3,1,0)(1,0,2)[12] with drift         : Inf
+ ARIMA(4,1,0)(0,0,1)[12] with drift         : 349.2894
+ ARIMA(3,1,1)(0,0,1)[12] with drift         : 347.6645
+ ARIMA(2,1,1)(0,0,1)[12] with drift         : 346.754
+ ARIMA(2,1,1)            with drift         : 359.2506
+ ARIMA(2,1,1)(1,0,1)[12] with drift         : Inf
+ ARIMA(2,1,1)(0,0,2)[12] with drift         : 348.4092
+ ARIMA(2,1,1)(1,0,0)[12] with drift         : 350.2436
+ ARIMA(2,1,1)(1,0,2)[12] with drift         : Inf
+ ARIMA(1,1,1)(0,0,1)[12] with drift         : 354.7731
+ ARIMA(2,1,2)(0,0,1)[12] with drift         : 348.0198
+ ARIMA(1,1,2)(0,0,1)[12] with drift         : 348.7836
+ ARIMA(3,1,2)(0,0,1)[12] with drift         : 349.5839
+ ARIMA(2,1,1)(0,0,1)[12]                    : 347.2775
+
+ Now re-fitting the best model(s) without approximations...
+
+ ARIMA(2,1,1)(0,0,1)[12] with drift         : 351.5017
+
+ Best model: ARIMA(2,1,1)(0,0,1)[12] with drift         </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(bestmodel<span class="sc">$</span>residuals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Null hypothesis: Residuals are iid noise.
+Test                        Distribution Statistic   p-value
+Ljung-Box Q                Q ~ chisq(20)     20.39    0.4339
+McLeod-Li Q                Q ~ chisq(20)     25.62    0.1789
+Turning points T  (T-118.7)/5.6 ~ N(0,1)       126    0.1926
+Diff signs S       (S-89.5)/3.9 ~ N(0,1)        96    0.0942
+Rank P           (P-8055)/404.2 ~ N(0,1)      8124    0.8644</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (2,1,1)x(0,1,1)12</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>fit3 <span class="ot">=</span> <span class="fu">arima</span>(chicken,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(fit3<span class="sc">$</span>residuals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Null hypothesis: Residuals are iid noise.
+Test                        Distribution Statistic   p-value
+Ljung-Box Q                Q ~ chisq(20)     24.19    0.2342
+McLeod-Li Q                Q ~ chisq(20)     24.05    0.2403
+Turning points T  (T-118.7)/5.6 ~ N(0,1)       109    0.0859
+Diff signs S       (S-89.5)/3.9 ~ N(0,1)        90    0.8976
+Rank P           (P-8055)/404.2 ~ N(0,1)      7886    0.6758</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(fit3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          2.5 %     97.5 %
+ar1   0.3663564  1.3562134
+ar2  -0.5707718  0.1810214
+ma1  -0.4705853  0.5126439
+sma1 -1.0460512 -0.7262905</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(0,1,1)12</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>fit4 <span class="ot">=</span> <span class="fu">arima</span>(chicken,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(fit4<span class="sc">$</span>residuals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Null hypothesis: Residuals are iid noise.
+Test                        Distribution Statistic   p-value
+Ljung-Box Q                Q ~ chisq(20)     26.57    0.1478
+McLeod-Li Q                Q ~ chisq(20)     25.56    0.1808
+Turning points T  (T-118.7)/5.6 ~ N(0,1)       113     0.314
+Diff signs S       (S-89.5)/3.9 ~ N(0,1)        90    0.8976
+Rank P           (P-8055)/404.2 ~ N(0,1)      7871    0.6489</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(fit4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          2.5 %     97.5 %
+ar1   0.4681032  0.7760098
+ma1   0.0658718  0.4202848
+sma1 -1.0423739 -0.7267580</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,0)x(0,1,1)12</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>fit5 <span class="ot">=</span> <span class="fu">arima</span>(chicken,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(fit5<span class="sc">$</span>residuals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Null hypothesis: Residuals are iid noise.
+Test                        Distribution Statistic   p-value
+Ljung-Box Q                Q ~ chisq(20)      45.3     0.001 *
+McLeod-Li Q                Q ~ chisq(20)     27.08     0.133
+Turning points T  (T-118.7)/5.6 ~ N(0,1)       105    0.0152 *
+Diff signs S       (S-89.5)/3.9 ~ N(0,1)        93    0.3675
+Rank P           (P-8055)/404.2 ~ N(0,1)      7762    0.4685</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(fit5)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          2.5 %     97.5 %
+ar1   0.6273766  0.8369342
+sma1 -0.9925757 -0.7215920</code></pre>
+</div>
+</div>
+<p>Fit 5 is not stationary. It will not be used.</p>
+</section>
+</section>
+<section id="models-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="models-comparison">Models Comparison</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Compare</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>AIC.values <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">AutoModel =</span> bestmodel<span class="sc">$</span>aic,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">fit1 =</span> fit1<span class="sc">$</span>aic,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fit2 =</span> fit2<span class="sc">$</span>aic,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">fit3 =</span> fit3<span class="sc">$</span>aic,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fit4 =</span> fit4<span class="sc">$</span>aic</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>AIC.values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>AutoModel      fit1      fit2      fit3      fit4 
+ 351.0134  317.9969  314.2806  317.2427  316.0594 </code></pre>
+</div>
+</div>
+<p>The SARIMA equation for (2,1,1)x(0,1,1)12 is:</p>
+<p><span class="math display">\[
+(1-0.861B+0.195B^2)(1-B)(1-B^{12})X_t = (1+0.021B)(1-0.886B^{12})Z_t
+\]</span></p>
+<p><span class="math display">\[
+Z_t \sim WN(0,0.329)
+\]</span></p>
+</section>
+<section id="forecating-with-time-series" class="level1">
+<h1>Forecating with Time Series</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>chicken_train <span class="ot">=</span> chicken[<span class="dv">1</span><span class="sc">:</span><span class="dv">170</span>]</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(1,1,1)12</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">=</span> <span class="fu">arima</span>(chicken_train,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(2,1,1)12</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>fit2 <span class="ot">=</span> <span class="fu">arima</span>(chicken_train,</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto fit</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>bestmodel <span class="ot">=</span> <span class="fu">auto.arima</span>(chicken_train, <span class="at">trace=</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Fitting models using approximations to speed things up...
+
+ ARIMA(2,1,2) with drift         : 347.0167
+ ARIMA(0,1,0) with drift         : 488.3928
+ ARIMA(1,1,0) with drift         : 366.5475
+ ARIMA(0,1,1) with drift         : 397.7907
+ ARIMA(0,1,0)                    : 499.836
+ ARIMA(1,1,2) with drift         : 351.2362
+ ARIMA(2,1,1) with drift         : 344.8664
+ ARIMA(1,1,1) with drift         : 357.355
+ ARIMA(2,1,0) with drift         : 347.3834
+ ARIMA(3,1,1) with drift         : 344.7761
+ ARIMA(3,1,0) with drift         : 345.4701
+ ARIMA(4,1,1) with drift         : Inf
+ ARIMA(3,1,2) with drift         : Inf
+ ARIMA(4,1,0) with drift         : 348.4639
+ ARIMA(4,1,2) with drift         : Inf
+ ARIMA(3,1,1)                    : Inf
+
+ Now re-fitting the best model(s) without approximations...
+
+ ARIMA(3,1,1) with drift         : Inf
+ ARIMA(2,1,1) with drift         : 349.2716
+
+ Best model: ARIMA(2,1,1) with drift         </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>bestmodel <span class="ot">=</span> <span class="fu">arima</span>(chicken_train, <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (2,1,1)x(0,1,1)12</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>fit3 <span class="ot">=</span> <span class="fu">arima</span>(chicken_train,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(0,1,1)12</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>fit4 <span class="ot">=</span> <span class="fu">arima</span>(chicken_train,</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,0)x(0,1,1)12</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>fit5 <span class="ot">=</span> <span class="fu">arima</span>(chicken_train,</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>),</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="using-forecast-function" class="level2">
+<h2 class="anchored" data-anchor-id="using-forecast-function">Using Forecast Function</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit1,<span class="at">lead =</span> <span class="dv">10</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit2,<span class="at">lead =</span> <span class="dv">10</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>f3 <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit3,<span class="at">lead =</span> <span class="dv">10</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>f4 <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit4,<span class="at">lead =</span> <span class="dv">10</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>f5 <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit5,<span class="at">lead =</span> <span class="dv">10</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>f.auto <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> bestmodel,<span class="at">lead =</span> <span class="dv">10</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="arar-algorithm-for-forecasting" class="level2">
+<h2 class="anchored" data-anchor-id="arar-algorithm-for-forecasting">ARAR Algorithm for Forecasting</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>arar.prd <span class="ot">=</span> <span class="fu">arar</span>(chicken_train, <span class="at">h=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Optimal lags 1 3 7 26 
+Optimal coeffs 0.7649962 -0.2222783 -0.1879812 -0.1420048 
+WN Variance 0.4066505 
+Filter 1 -1.76855 0.7677147 0.2222783 -0.2230682 0 0 0.1879812 -0.1886492 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1420048 -0.1425095 
+
+ Step     Prediction      sqrt(MSE)    Lower Bound    Upper Bound
+    1       114.8751      0.6376915       113.6252        116.125
+    2       115.1194       1.295592         112.58       117.6587
+    3       115.6783       1.985836        111.786       119.5705
+    4       116.4949       2.584476       111.4294       121.5605
+    5       117.4627       3.072466       111.4406       123.4847
+    6       118.4573       3.457484       111.6806       125.2339
+    7       119.4271       3.767544       112.0427       126.8115
+    8       120.1903       3.988641       112.3726       128.0081
+    9       120.5408       4.135788       112.4347        128.647
+   10       120.5941        4.22821       112.3068       128.8814</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>HWmodel <span class="ot">=</span> <span class="fu">HoltWinters</span>(<span class="fu">ts</span>(chicken_train,<span class="at">start=</span><span class="dv">1</span>,<span class="at">frequency =</span> <span class="dv">12</span>),<span class="at">seasonal =</span> <span class="st">"mult"</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>HW.prd <span class="ot">=</span>forecast<span class="sc">::</span><span class="fu">forecast</span>(HWmodel,<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="forecasting-performance-evaluation" class="level3">
+<h3 class="anchored" data-anchor-id="forecasting-performance-evaluation">Forecasting Performance Evaluation</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Metrics)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>MAPE1 <span class="ot">=</span> <span class="fu">mape</span>(chicken[<span class="dv">171</span><span class="sc">:</span><span class="dv">180</span>],f1[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>MAPE2 <span class="ot">=</span> <span class="fu">mape</span>(chicken[<span class="dv">171</span><span class="sc">:</span><span class="dv">180</span>],f2[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>MAPE3 <span class="ot">=</span> <span class="fu">mape</span>(chicken[<span class="dv">171</span><span class="sc">:</span><span class="dv">180</span>],f3[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>MAPE4 <span class="ot">=</span> <span class="fu">mape</span>(chicken[<span class="dv">171</span><span class="sc">:</span><span class="dv">180</span>],f4[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>MAPE5 <span class="ot">=</span> <span class="fu">mape</span>(chicken[<span class="dv">171</span><span class="sc">:</span><span class="dv">180</span>],f5[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>MAPEauto <span class="ot">=</span> <span class="fu">mape</span>(chicken[<span class="dv">171</span><span class="sc">:</span><span class="dv">180</span>],f.auto[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>MAPEarar <span class="ot">=</span> <span class="fu">mape</span>(chicken[<span class="dv">171</span><span class="sc">:</span><span class="dv">180</span>],arar.prd<span class="sc">$</span>pred)<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>MAPEhw <span class="ot">=</span> <span class="fu">mape</span>(chicken[<span class="dv">171</span><span class="sc">:</span><span class="dv">180</span>],HW.prd<span class="sc">$</span>mean)<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>MAPEs <span class="ot">=</span> <span class="fu">c</span>(<span class="at">fit1_mape =</span> MAPE1,</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit2_mape =</span> MAPE2,</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit3_mape =</span> MAPE3,</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit4_mape =</span> MAPE4,</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit5_mape =</span> MAPE5,</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">fitauto_mape =</span> MAPEauto,</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">arar.model =</span> MAPEarar,</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">hw.model =</span> MAPEhw)</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>MAPEs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   fit1_mape    fit2_mape    fit3_mape    fit4_mape    fit5_mape fitauto_mape 
+    2.245804     2.707520     2.361666     2.248047     2.130850     1.942902 
+  arar.model     hw.model 
+    4.926459     1.651263 </code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="us-employment-data" class="level1">
+<h1>US Employment Data</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fpp3)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>us_empl <span class="ot">=</span> us_employment <span class="sc">%&gt;%</span> </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(Month)<span class="sc">&gt;</span><span class="dv">2009</span>, Title<span class="sc">==</span><span class="st">"All Employees, Total Nonfarm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Series_ID)</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>us_empl <span class="sc">%&gt;%</span> </span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(Employed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">auto.arima</span>(us_empl<span class="sc">$</span>Employed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Series: us_empl$Employed 
+ARIMA(3,1,1) with drift 
+
+Coefficients:
+         ar1      ar2      ar3      ma1     drift
+      0.5173  -0.2112  -0.3101  -0.9059  198.7101
+s.e.  0.0944   0.0974   0.0926   0.0499    8.0855
+
+sigma^2 = 715029:  log likelihood = -945.12
+AIC=1902.24   AICc=1903.01   BIC=1918.76</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>empl_data <span class="ot">=</span> us_empl<span class="sc">$</span>Employed</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(empl_data,<span class="at">lag.max =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>M <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"diff"</span>,<span class="dv">1</span>,<span class="st">"diff"</span>,<span class="dv">12</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>r <span class="ot">=</span> <span class="fu">Resid</span>(empl_data,M)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(r)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Null hypothesis: Residuals are iid noise.
+Test                        Distribution Statistic   p-value
+Ljung-Box Q                Q ~ chisq(20)     36.26    0.0143 *
+McLeod-Li Q                Q ~ chisq(20)     16.13    0.7087
+Turning points T     (T-68)/4.3 ~ N(0,1)        73    0.2408
+Diff signs S         (S-51.5)/3 ~ N(0,1)        54     0.398
+Rank P             (P-2678)/178 ~ N(0,1)      2339    0.0569</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="forecasting-Gavilanes_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">6</span>,<span class="dv">11</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>P <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>q <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">11</span>)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>Q <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>all <span class="ot">=</span> <span class="fu">expand_grid</span>(p,P,q,Q)</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="co"># this function fit a SARIM model, forecast, and calculate the mape</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">=</span> <span class="cf">function</span>(x,p,d,q,P,D,Q,s,h){</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="co"># x train</span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">=</span> x[<span class="dv">1</span><span class="sc">:</span><span class="fu">I</span>(<span class="fu">length</span>(x)<span class="sc">-</span>h)]  </span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the model</span></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>ft <span class="ot">=</span> <span class="fu">arima</span>(x_train, </span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">order =</span> <span class="fu">c</span>(p,d,q) ,</span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(P,D,Q),<span class="at">period=</span>s))</span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a><span class="co"># predict the h ahead point using SARIMA</span></span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>prd <span class="ot">=</span> <span class="fu">predict</span>(ft,h)<span class="sc">$</span>pred[<span class="dv">1</span><span class="sc">:</span>h]</span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a><span class="co"># fit and predict using Holt-Winters</span></span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>HWmodel <span class="ot">=</span> <span class="fu">HoltWinters</span>(<span class="fu">ts</span>(x_train,<span class="at">start=</span><span class="dv">1</span>,<span class="at">frequency =</span> s),<span class="at">seasonal =</span> <span class="st">"mult"</span>)</span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a>prdhw <span class="ot">=</span> forecast<span class="sc">::</span><span class="fu">forecast</span>(HWmodel,h)</span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true" tabindex="-1"></a><span class="co"># fit and predict using ARAR</span></span>
+<span id="cb49-24"><a href="#cb49-24" aria-hidden="true" tabindex="-1"></a>prdarar <span class="ot">=</span> <span class="fu">arar</span>(x_train,h,<span class="at">opt=</span><span class="dv">0</span>)</span>
+<span id="cb49-25"><a href="#cb49-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-26"><a href="#cb49-26" aria-hidden="true" tabindex="-1"></a><span class="co"># actual data</span></span>
+<span id="cb49-27"><a href="#cb49-27" aria-hidden="true" tabindex="-1"></a>actual <span class="ot">=</span> x[<span class="fu">I</span>(<span class="fu">length</span>(x)<span class="sc">-</span>h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">length</span>(x)]</span>
+<span id="cb49-28"><a href="#cb49-28" aria-hidden="true" tabindex="-1"></a><span class="co"># return the mape</span></span>
+<span id="cb49-29"><a href="#cb49-29" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span>(<span class="fu">c</span>(<span class="at">sarima=</span><span class="dv">100</span><span class="sc">*</span><span class="fu">mape</span>(actual,prd),</span>
+<span id="cb49-30"><a href="#cb49-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">arar =</span> <span class="dv">100</span><span class="sc">*</span><span class="fu">mape</span>(actual,prdarar<span class="sc">$</span>pred),</span>
+<span id="cb49-31"><a href="#cb49-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">hw =</span> <span class="dv">100</span><span class="sc">*</span><span class="fu">mape</span>(actual,prdhw<span class="sc">$</span>mean)))</span>
+<span id="cb49-32"><a href="#cb49-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(chicken,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">12</span>,<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sarima     arar       hw 
+2.245804 4.926459 1.651263 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(chicken,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">12</span>,<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sarima     arar       hw 
+2.707520 4.926459 1.651263 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(chicken,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">12</span>,<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sarima     arar       hw 
+2.361666 4.926459 1.651263 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(chicken,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">12</span>,<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sarima     arar       hw 
+2.248047 4.926459 1.651263 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(chicken,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">12</span>,<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sarima     arar       hw 
+2.130850 4.926459 1.651263 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(us_empl<span class="sc">$</span>Employed,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">12</span>,<span class="dv">12</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sarima      arar        hw 
+0.1221530 0.1512980 0.1260559 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(us_empl<span class="sc">$</span>Employed,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">12</span>,<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sarima      arar        hw 
+0.1839835 0.2365320 0.2230439 </code></pre>
+</div>
+</div>
+<section id="using-sarima-function-for-different-datasets" class="level2">
+<h2 class="anchored" data-anchor-id="using-sarima-function-for-different-datasets">Using SARIMA function for different Datasets</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(wine,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">12</span>,<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sarima      arar        hw 
+12.774348  9.806519  9.618597 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(AirPassengers,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">12</span>,<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sarima     arar       hw 
+6.960630 3.218274 2.105447 </code></pre>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
