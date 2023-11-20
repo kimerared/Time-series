@@ -158,7 +158,7 @@ birth_fit4 = arima(birth,
 
 ```
 
-### Fit 5
+### Fit 5 - Best Model
 
 ```{r}
 # SARIMA (0,1,2)x(1,1,2)12
@@ -274,13 +274,13 @@ fit4_forecast  = arima(birth_training,
             order = c(5,1,5),
             seasonal = list(order=c(1,1,2),period=12))
 
-# SARIMA (1,1,1)x(2,1,1)12
+# SARIMA (0,1,1)x(1,1,2)12
 fit5_forecast  = arima(birth_training,
             order = c(0,1,2),
             seasonal = list(order=c(1,1,2),period=12))
 
 # Auto fit
-bestmodel_forecast  = auto.arima(birth_training, trace= T)
+bestmodel_forecast  = auto.arima(birth_training, trace= T, seasonal = T)
 ```
 
 ```{r}
@@ -289,13 +289,6 @@ bestmodel_forecast = arima(birth_training, order = c(1,1,0))
 # Autofit
 f.auto = aTSA::forecast(object = bestmodel_forecast,lead = 6, output = FALSE)
 
-```
-
-```{r}
-#f.auto = forecast(object = bestmodel_forecast, h = 6)
-
-# Plot the results
-# plot(f.auto)
 ```
 
 ```{r}

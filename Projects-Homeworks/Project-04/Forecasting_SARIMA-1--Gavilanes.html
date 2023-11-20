@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.433">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -3478,7 +3478,7 @@ Note: in fact, p.value = 0.01 means p.value &lt;= 0.01 </code></pre>
 <section id="fit-3" class="level3">
 <h3 class="anchored" data-anchor-id="fit-3">Fit 3</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (24,1,1)x(2,1,1)12</span></span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (5,1,1)x(2,1,1)12</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>birth_fit3 <span class="ot">=</span> <span class="fu">arima</span>(birth,</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="at">period=</span><span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3493,8 +3493,8 @@ Note: in fact, p.value = 0.01 means p.value &lt;= 0.01 </code></pre>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">period=</span><span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="fit-5" class="level3">
-<h3 class="anchored" data-anchor-id="fit-5">Fit 5</h3>
+<section id="fit-5---best-model" class="level3">
+<h3 class="anchored" data-anchor-id="fit-5---best-model">Fit 5 - Best Model</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (0,1,2)x(1,1,2)12</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>birth_fit5 <span class="ot">=</span> <span class="fu">arima</span>(birth,</span>
@@ -3609,7 +3609,7 @@ sma1 -1.01732748 -0.81025300</code></pre>
 <section id="fit-3-1" class="level3">
 <h3 class="anchored" data-anchor-id="fit-3-1">Fit 3</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (24,1,1)x(2,1,1)12</span></span>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (5,1,1)x(2,1,1)12</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(birth_fit3<span class="sc">$</span>residuals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Null hypothesis: Residuals are iid noise.
@@ -3674,8 +3674,8 @@ sma2 -0.54388501  0.9489838</code></pre>
 </div>
 </div>
 </section>
-<section id="fit-5-1" class="level3">
-<h3 class="anchored" data-anchor-id="fit-5-1">Fit 5</h3>
+<section id="fit-5" class="level3">
+<h3 class="anchored" data-anchor-id="fit-5">Fit 5</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (0,1,2)x(1,1,2)12</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(birth_fit5<span class="sc">$</span>residuals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3708,7 +3708,7 @@ sma2  0.4231010  0.90038906</code></pre>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparison</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>AIC.values <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">autofit =</span> birth_bestmodel<span class="sc">$</span>aic,</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">automodel =</span> birth_bestmodel<span class="sc">$</span>aic,</span>
 <span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit1 =</span> birth_fit1<span class="sc">$</span>aic,</span>
 <span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit2 =</span> birth_fit2<span class="sc">$</span>aic,</span>
 <span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit3 =</span> birth_fit3<span class="sc">$</span>aic,</span>
@@ -3717,8 +3717,8 @@ sma2  0.4231010  0.90038906</code></pre>
 <span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>AIC.values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> autofit     fit1     fit2     fit3     fit4     fit5 
-2419.863 2424.077 2431.206 2422.691 2427.099 2420.430 </code></pre>
+<pre><code>automodel      fit1      fit2      fit3      fit4      fit5 
+ 2419.863  2424.077  2431.206  2422.691  2427.099  2420.430 </code></pre>
 </div>
 </div>
 <ul>
@@ -3732,7 +3732,11 @@ sma2  0.4231010  0.90038906</code></pre>
 <section id="split-data-to-two-data-sets-training-367-obs.-and-testing-the-most-recentlast-6-obs." class="level2">
 <h2 class="anchored" data-anchor-id="split-data-to-two-data-sets-training-367-obs.-and-testing-the-most-recentlast-6-obs.">9. Split data to two data sets: training (367 obs.) and testing (the most recent/last 6 obs.)</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>birth_training <span class="ot">=</span> birth[<span class="dv">1</span><span class="sc">:</span><span class="dv">367</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Training Split</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>birth_training <span class="ot">=</span> birth[<span class="dv">1</span><span class="sc">:</span><span class="dv">367</span>]</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a time series</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>birth_training_ts <span class="ot">=</span> <span class="fu">ts</span>(birth_training,<span class="at">start=</span><span class="dv">1</span>,<span class="at">frequency =</span> <span class="dv">12</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="fit-a-sarima-model-to-the-training-series-and-forecast-the-next-6-observations." class="level2">
@@ -3758,7 +3762,7 @@ sma2  0.4231010  0.90038906</code></pre>
 <span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">5</span>),</span>
 <span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
 <span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(2,1,1)12</span></span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (0,1,1)x(1,1,2)12</span></span>
 <span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>fit5_forecast  <span class="ot">=</span> <span class="fu">arima</span>(birth_training,</span>
 <span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>),</span>
 <span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
@@ -3791,18 +3795,24 @@ sma2  0.4231010  0.90038906</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit1_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>f2  <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit2_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>f3  <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit3_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>f4  <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit4_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>f5  <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit5_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Best Model</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>bestmodel_forecast <span class="ot">=</span> <span class="fu">arima</span>(birth_training, <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Autofit</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>f.auto <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> bestmodel_forecast,<span class="at">lead =</span> <span class="dv">6</span>, <span class="at">output =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit1_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>f2  <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit2_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>f3  <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit3_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>f4  <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit4_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>f5  <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> fit5_forecast,<span class="at">lead =</span> <span class="dv">6</span>,<span class="at">output =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="run-arar-and-holt-winters-algorithms-to-predict-the-same-number-of-observations." class="level2">
 <h2 class="anchored" data-anchor-id="run-arar-and-holt-winters-algorithms-to-predict-the-same-number-of-observations.">11. Run ARAR and Holt-Winters algorithms to predict the same number of observations.</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ARAR</span></span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>arar.prd <span class="ot">=</span> <span class="fu">arar</span>(birth_training, <span class="at">h=</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ARAR</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>arar.prd <span class="ot">=</span> <span class="fu">arar</span>(birth_training, <span class="at">h=</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Optimal lags 1 5 12 13 
 Optimal coeffs 0.6915158 0.1986235 -0.4050149 0.3325551 
@@ -3822,35 +3832,39 @@ Filter 1 -0.6915158 0 0 0 -0.1986235 0 0 0 0 0 0 -0.5922443 0.3570654 0 0 0 0.19
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Holt-Winters</span></span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>HWmodel <span class="ot">=</span> <span class="fu">HoltWinters</span>(<span class="fu">ts</span>(birth_training,<span class="at">start=</span><span class="dv">1</span>,<span class="at">frequency =</span> <span class="dv">12</span>),<span class="at">seasonal =</span> <span class="st">&quot;mult&quot;</span>)</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>HW.prd <span class="ot">=</span>forecast<span class="sc">::</span><span class="fu">forecast</span>(HWmodel,<span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Holt-Winters</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>HWmodel <span class="ot">=</span> <span class="fu">HoltWinters</span>(birth_training_ts,<span class="at">seasonal =</span> <span class="st">&quot;mult&quot;</span>)</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>HW.prd <span class="ot">=</span>forecast<span class="sc">::</span><span class="fu">forecast</span>(HWmodel,<span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="compare-the-models-in-terms-of-mape." class="level2">
 <h2 class="anchored" data-anchor-id="compare-the-models-in-terms-of-mape.">12. Compare the models in terms of MAPE.</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Metrics)</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>MAPE1 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f1[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>MAPE2 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f2[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>MAPE3 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f3[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>MAPE4 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f4[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
-<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>MAPE5 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f5[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
-<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>MAPEarar <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],arar.prd<span class="sc">$</span>pred)<span class="sc">*</span><span class="dv">100</span></span>
-<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>MAPEhw <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],HW.prd<span class="sc">$</span>mean)<span class="sc">*</span><span class="dv">100</span></span>
-<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>MAPEs <span class="ot">=</span> <span class="fu">c</span>(<span class="at">fit1_mape =</span> MAPE1,</span>
-<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit2_mape =</span> MAPE2,</span>
-<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit3_mape =</span> MAPE3,</span>
-<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit4_mape =</span> MAPE4,</span>
-<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit5_mape =</span> MAPE5,</span>
-<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">arar.model =</span> MAPEarar,</span>
-<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">hw.model =</span> MAPEhw)</span>
-<span id="cb54-18"><a href="#cb54-18" aria-hidden="true" tabindex="-1"></a>MAPEs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Metrics)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>MAPE1 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f1[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>MAPE2 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f2[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>MAPE3 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f3[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>MAPE4 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f4[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>MAPE5 <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f5[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>MAPEauto <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],f.auto[,<span class="dv">2</span>])<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>MAPEarar <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],arar.prd<span class="sc">$</span>pred)<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>MAPEhw <span class="ot">=</span> <span class="fu">mape</span>(birth[<span class="dv">368</span><span class="sc">:</span><span class="dv">373</span>],HW.prd<span class="sc">$</span>mean)<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>MAPEs <span class="ot">=</span> <span class="fu">c</span>(<span class="at">fit1_mape =</span> MAPE1,</span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit2_mape =</span> MAPE2,</span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit3_mape =</span> MAPE3,</span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit4_mape =</span> MAPE4,</span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">fit5_mape =</span> MAPE5,</span>
+<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">fitauto_mape =</span> MAPEauto,</span>
+<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">arar.model =</span> MAPEarar,</span>
+<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">hw.model =</span> MAPEhw)</span>
+<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a>MAPEs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> fit1_mape  fit2_mape  fit3_mape  fit4_mape  fit5_mape arar.model   hw.model 
-  2.084180   2.118238   2.107496   2.109824   2.011246   2.977125   2.203462 </code></pre>
+<pre><code>   fit1_mape    fit2_mape    fit3_mape    fit4_mape    fit5_mape fitauto_mape 
+    2.084180     2.118238     2.107496     2.109824     2.011246     3.771297 
+  arar.model     hw.model 
+    2.977125     2.203462 </code></pre>
 </div>
 </div>
 <ul>
