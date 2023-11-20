@@ -158,7 +158,7 @@ birth_fit4 = arima(birth,
 
 ```
 
-### Fit 5 
+### Fit 5
 
 ```{r}
 # SARIMA (0,1,2)x(1,1,2)12
