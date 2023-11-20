@@ -33,7 +33,7 @@ pacf(birth, lag.max = 50)
 plota(birth)
 ```
 
--   There is an an upward trend at the beggining, but it has a correction (downward trend) after 1960.
+-   There is an an upward trend at the begining, but it has a correction (downward trend) after 1960.
 
 -   There is seasonality of 12.
 
@@ -158,7 +158,7 @@ birth_fit4 = arima(birth,
 
 ```
 
-### Fit 5 - Best Model
+### Fit 5 
 
 ```{r}
 # SARIMA (0,1,2)x(1,1,2)12
@@ -254,22 +254,22 @@ birth_training_ts = ts(birth_training,start=1,frequency = 12)
 ## 10. Fit a SARIMA model to the training series and forecast the next 6 observations.
 
 ```{r}
-# SARIMA (1,1,1)x(1,1,1)12
+# SARIMA (7,1,1)x(1,1,1)12
 fit1_forecast = arima(birth_training,
             order = c(7,1,1),
             seasonal = list(order=c(1,1,1),period=12))
 
-# SARIMA (1,1,1)x(2,1,1)12
+# SARIMA (0,1,2)x(1,1,1)12
 fit2_forecast  = arima(birth_training,
-            order = c(14,1,1),
-            seasonal = list(order=c(2,1,1),period=12))
+            order = c(0,1,2),
+            seasonal = list(order=c(1,1,1),period=12))
 
-# SARIMA (1,1,1)x(2,1,1)12
+# SARIMA (5,1,1)x(2,1,1)12
 fit3_forecast  = arima(birth_training,
-            order = c(24,1,1),
+            order = c(5,1,1),
             seasonal = list(order=c(2,1,1),period=12))
 
-# SARIMA (1,1,1)x(2,1,1)12
+# SARIMA (5,1,5)x(1,1,2)12
 fit4_forecast  = arima(birth_training,
             order = c(5,1,5),
             seasonal = list(order=c(1,1,2),period=12))
@@ -280,13 +280,13 @@ fit5_forecast  = arima(birth_training,
             seasonal = list(order=c(1,1,2),period=12))
 
 # Auto fit
-bestmodel_forecast  = auto.arima(birth_training, trace= T, seasonal = T)
+automodel_forecast  = auto.arima(birth_training, trace= T, seasonal = T)
 ```
 
 ```{r}
-# Best Model
+# Autofit arima
 bestmodel_forecast = arima(birth_training, order = c(1,1,0))
-# Autofit
+# Autofit forecast
 f.auto = aTSA::forecast(object = bestmodel_forecast,lead = 6, output = FALSE)
 
 ```
@@ -338,4 +338,4 @@ MAPEs = c(fit1_mape = MAPE1,
 MAPEs
 ```
 
--   Fit5 (0,1,2)x(1,1,2)x12 has the lowest MAPE (Mean Absolute Percent Error) of 2.011.
+-   Fit5 (0,1,2)x(1,1,2)x12 has the lowest Mean Absolute Percent Error, MAPE = 2.011.

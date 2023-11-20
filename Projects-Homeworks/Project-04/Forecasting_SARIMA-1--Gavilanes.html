@@ -3188,7 +3188,7 @@ return!"\t\n\x0B\f\r                　\u2028\u2029
 </div>
 </div>
 <ul>
-<li><p>There is an an upward trend at the beggining, but it has a correction (downward trend) after 1960.</p></li>
+<li><p>There is an an upward trend at the begining, but it has a correction (downward trend) after 1960.</p></li>
 <li><p>There is seasonality of 12.</p></li>
 <li><p>It seems that there is no drastic variance changes.</p></li>
 </ul>
@@ -3493,8 +3493,8 @@ Note: in fact, p.value = 0.01 means p.value &lt;= 0.01 </code></pre>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">period=</span><span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="fit-5---best-model" class="level3">
-<h3 class="anchored" data-anchor-id="fit-5---best-model">Fit 5 - Best Model</h3>
+<section id="fit-5" class="level3">
+<h3 class="anchored" data-anchor-id="fit-5">Fit 5</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (0,1,2)x(1,1,2)12</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>birth_fit5 <span class="ot">=</span> <span class="fu">arima</span>(birth,</span>
@@ -3674,8 +3674,8 @@ sma2 -0.54388501  0.9489838</code></pre>
 </div>
 </div>
 </section>
-<section id="fit-5" class="level3">
-<h3 class="anchored" data-anchor-id="fit-5">Fit 5</h3>
+<section id="fit-5-1" class="level3">
+<h3 class="anchored" data-anchor-id="fit-5-1">Fit 5</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (0,1,2)x(1,1,2)12</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(birth_fit5<span class="sc">$</span>residuals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3742,22 +3742,22 @@ sma2  0.4231010  0.90038906</code></pre>
 <section id="fit-a-sarima-model-to-the-training-series-and-forecast-the-next-6-observations." class="level2">
 <h2 class="anchored" data-anchor-id="fit-a-sarima-model-to-the-training-series-and-forecast-the-next-6-observations.">10. Fit a SARIMA model to the training series and forecast the next 6 observations.</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(1,1,1)12</span></span>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (7,1,1)x(1,1,1)12</span></span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>fit1_forecast <span class="ot">=</span> <span class="fu">arima</span>(birth_training,</span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">7</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
 <span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
 <span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(2,1,1)12</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (0,1,2)x(1,1,1)12</span></span>
 <span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>fit2_forecast  <span class="ot">=</span> <span class="fu">arima</span>(birth_training,</span>
-<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">14</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
-<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>),</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
 <span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(2,1,1)12</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (5,1,1)x(2,1,1)12</span></span>
 <span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>fit3_forecast  <span class="ot">=</span> <span class="fu">arima</span>(birth_training,</span>
-<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">24</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
 <span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
 <span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (1,1,1)x(2,1,1)12</span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a><span class="co"># SARIMA (5,1,5)x(1,1,2)12</span></span>
 <span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>fit4_forecast  <span class="ot">=</span> <span class="fu">arima</span>(birth_training,</span>
 <span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">5</span>),</span>
 <span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
@@ -3768,7 +3768,7 @@ sma2  0.4231010  0.90038906</code></pre>
 <span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">seasonal =</span> <span class="fu">list</span>(<span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>),<span class="at">period=</span><span class="dv">12</span>))</span>
 <span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto fit</span></span>
-<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>bestmodel_forecast  <span class="ot">=</span> <span class="fu">auto.arima</span>(birth_training, <span class="at">trace=</span> T, <span class="at">seasonal =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>automodel_forecast  <span class="ot">=</span> <span class="fu">auto.arima</span>(birth_training, <span class="at">trace=</span> T, <span class="at">seasonal =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Fitting models using approximations to speed things up...
@@ -3795,9 +3795,9 @@ sma2  0.4231010  0.90038906</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Best Model</span></span>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Autofit arima</span></span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>bestmodel_forecast <span class="ot">=</span> <span class="fu">arima</span>(birth_training, <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Autofit</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Autofit forecast</span></span>
 <span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>f.auto <span class="ot">=</span> aTSA<span class="sc">::</span><span class="fu">forecast</span>(<span class="at">object =</span> bestmodel_forecast,<span class="at">lead =</span> <span class="dv">6</span>, <span class="at">output =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
@@ -3862,13 +3862,13 @@ Filter 1 -0.6915158 0 0 0 -0.1986235 0 0 0 0 0 0 -0.5922443 0.3570654 0 0 0 0.19
 <span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a>MAPEs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   fit1_mape    fit2_mape    fit3_mape    fit4_mape    fit5_mape fitauto_mape 
-    2.084180     2.118238     2.107496     2.109824     2.011246     3.771297 
+    2.084180     2.076262     2.110923     2.109824     2.011246     3.771297 
   arar.model     hw.model 
     2.977125     2.203462 </code></pre>
 </div>
 </div>
 <ul>
-<li>Fit5 (0,1,2)x(1,1,2)x12 has the lowest MAPE (Mean Absolute Percent Error) of 2.011.</li>
+<li>Fit5 (0,1,2)x(1,1,2)x12 has the lowest Mean Absolute Percent Error, MAPE = 2.011.</li>
 </ul>
 </section>
 
