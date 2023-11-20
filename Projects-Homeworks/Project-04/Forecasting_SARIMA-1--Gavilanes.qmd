@@ -141,7 +141,7 @@ birth_fit2 = arima(birth,
 ### Fit 3
 
 ```{r}
-# SARIMA (24,1,1)x(2,1,1)12
+# SARIMA (5,1,1)x(2,1,1)12
 birth_fit3 = arima(birth,
              order = c(5,1,1),
              seasonal = list(order=c(2,1,1), period=12))
@@ -197,7 +197,7 @@ confint(birth_fit2)
 ### Fit 3
 
 ```{r}
-# SARIMA (24,1,1)x(2,1,1)12
+# SARIMA (5,1,1)x(2,1,1)12
 test(birth_fit3$residuals)
 confint(birth_fit3)
 ```
@@ -223,7 +223,7 @@ confint(birth_fit5)
 ```{r}
 # Comparison
 AIC.values = c(
-  autofit = birth_bestmodel$aic,
+  automodel = birth_bestmodel$aic,
   fit1 = birth_fit1$aic,
   fit2 = birth_fit2$aic,
   fit3 = birth_fit3$aic,
@@ -244,7 +244,11 @@ AIC.values
 ## 9. Split data to two data sets: training (367 obs.) and testing (the most recent/last 6 obs.)
 
 ```{r}
+# Training Split
 birth_training = birth[1:367]
+
+# Creating a time series
+birth_training_ts = ts(birth_training,start=1,frequency = 12)
 ```
 
 ## 10. Fit a SARIMA model to the training series and forecast the next 6 observations.
@@ -276,7 +280,22 @@ fit5_forecast  = arima(birth_training,
             seasonal = list(order=c(1,1,2),period=12))
 
 # Auto fit
-bestmodel_forecast  = auto.arima(birth_training, trace= T, seasonal = T)
+bestmodel_forecast  = auto.arima(birth_training, trace= T)
+```
+
+```{r}
+# Best Model
+bestmodel_forecast = arima(birth_training, order = c(1,1,0))
+# Autofit
+f.auto = aTSA::forecast(object = bestmodel_forecast,lead = 6, output = FALSE)
+
+```
+
+```{r}
+#f.auto = forecast(object = bestmodel_forecast, h = 6)
+
+# Plot the results
+# plot(f.auto)
 ```
 
 ```{r}
@@ -297,7 +316,7 @@ arar.prd = arar(birth_training, h=6)
 
 ```{r}
 # Holt-Winters
-HWmodel = HoltWinters(ts(birth_training,start=1,frequency = 12),seasonal = "mult")
+HWmodel = HoltWinters(birth_training_ts,seasonal = "mult")
 HW.prd =forecast::forecast(HWmodel,6)
 ```
 
@@ -310,6 +329,7 @@ MAPE2 = mape(birth[368:373],f2[,2])*100
 MAPE3 = mape(birth[368:373],f3[,2])*100
 MAPE4 = mape(birth[368:373],f4[,2])*100
 MAPE5 = mape(birth[368:373],f5[,2])*100
+MAPEauto = mape(birth[368:373],f.auto[,2])*100
 MAPEarar = mape(birth[368:373],arar.prd$pred)*100
 MAPEhw = mape(birth[368:373],HW.prd$mean)*100
 
@@ -319,6 +339,7 @@ MAPEs = c(fit1_mape = MAPE1,
           fit3_mape = MAPE3,
           fit4_mape = MAPE4,
           fit5_mape = MAPE5,
+          fitauto_mape = MAPEauto,
           arar.model = MAPEarar,
           hw.model = MAPEhw)
 MAPEs
