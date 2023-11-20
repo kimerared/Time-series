@@ -1,0 +1,327 @@
+---
+title: "STA6856 Time Series"
+subtitle: "Assignment 3"
+author: "Hector Gavilanes"
+format: html
+embed-resources: true
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+We are going to fit an SARIMA(p, d, q) × (P, D, Q)s model to a dataset. We will be using the Monthly Live birth in thousands in the U.S., 1948 to 1979.
+
+This data is given by birth in package `astsa`. You can proceed as follows:
+
+```{r, message=FALSE, warning=FALSE}
+library(itsmr)
+library(astsa)
+library(aTSA)     #adf.test, forecast()
+library(forecast)
+library(fpp3)
+library(car)      #power transformation
+```
+
+## 1. Examine the plots of the time series, its ACF, and its PACF.
+
+```{r}
+plot(birth)
+# ACF, PACF
+acf(birth, lag.max = 80)
+pacf(birth, lag.max = 50)
+plota(birth)
+```
+
+-   There is an an upward trend at the beggining, but it has a correction (downward trend) after 1960.
+
+-   There is seasonality of 12.
+
+-   It seems that there is no drastic variance changes.
+
+## 2. Do a transformation and eliminate the trend and/or seasonal components, if applicable.
+
+```{r}
+# Variance change transformation
+lambda = powerTransform(birth)
+lambda$roundlam
+
+# Seasonality
+birth_season = season(birth, d=12)
+plotc(birth_season)
+```
+
+Lambda is 1, then $\lambda$ = y. No transformation required. However, there is seasonality, d = 12.
+
+## 3. Test IID hypothesis for the residuals R1.
+
+```{r}
+# Differencing Operator
+birth_diff = c("diff", 12, "diff", 1)
+
+# IID hypothesis test
+birth_r_diff = Resid(birth, birth_diff)
+test(birth_r_diff)
+```
+
+-   Reject the IID null hypothesis. The time series is not stationary.
+
+## 4. If the IID hypothesis is rejected then test the stationary hypothesis.
+
+```{r}
+# Stationary Test
+adf.test(birth_r_diff)
+```
+
+-   FTR the null hypothesis. The time series is stationary.
+
+-   No differencing is needed.
+
+## 5. If the stationary hypothesis is not rejected then based on ACF and PACF of the residuals list the potential models.
+
+### Based on the PACF
+
+P = 0,1,2,5,7:14,16,24,25
+
+p = 0,1,2,3
+
+### Based on the ACF
+
+q = 0,1:72
+
+Q = 0,1:6
+
+### Eliminate Trend & Season
+
+d = 1 (differencing non-seasonal)
+
+D = 1 (differencing seasonal)
+
+## 6. Fit and compare the models using AIC Present the result in a table as follows (give at least 5 models), including the auto.arima model.
+
+-   
+
+    | Models  | p   | d   | q   | P   | D   | Q   | $\sigma^2$ | AIC     | IDD hypothesis |
+    |---------|-----|-----|-----|-----|-----|-----|------------|---------|----------------|
+    | Autofit | 0   | 1   | 2   | 1   | 1   | 1   | 46.1       | 2419.86 | FTR            |
+    | 1       | 7   | 1   | 1   | 2   | 1   | 1   | 44.54      | 2424.08 | FTR            |
+    | 2       | 14  | 1   | 1   | 2   | 1   | 1   | 43.07      | 2431.21 | FTR            |
+    | 3       | 5   | 1   | 1   | 2   | 1   | 1   | 41.91      | 2441.46 | FTR            |
+    | 4       | 5   | 1   | 5   | 1   | 1   | 2   | 43.99      | 2427.1  | FTR            |
+    | 5       | 0   | 1   | 2   | 1   | 1   | 2   | 43.89      | 2420.43 | FTR            |
+
+### Autofit
+
+```{r}
+# Auto fit
+birth_bestmodel = auto.arima(birth, trace = T)
+# SARIMA (0,1,2)x(1,1,1)12
+```
+
+### Fit 1
+
+```{r}
+# SARIMA (7,1,1)x(1,1,1)12
+birth_fit1 = arima(birth,
+             order = c(7,1,1),
+             seasonal = list(order=c(1,1,1), period=12))
+
+```
+
+### Fit 2
+
+```{r}
+# SARIMA (14,1,1)x(2,1,1)12
+birth_fit2 = arima(birth,
+             order = c(14,1,1),
+             seasonal = list(order=c(2,1,1), period=12))
+
+```
+
+### Fit 3
+
+```{r}
+# SARIMA (24,1,1)x(2,1,1)12
+birth_fit3 = arima(birth,
+             order = c(5,1,1),
+             seasonal = list(order=c(2,1,1), period=12))
+
+```
+
+### Fit 4
+
+```{r}
+# SARIMA (5,1,5)x(1,1,2)12
+birth_fit4 = arima(birth,
+             order = c(5,1,5),
+             seasonal = list(order=c(1,1,2), period=12))
+
+```
+
+### Fit 5
+
+```{r}
+# SARIMA (0,1,2)x(1,1,2)12
+birth_fit5 = arima(birth,
+             order = c(0,1,2),
+             seasonal = list(order=c(1,1,2), period=12))
+
+```
+
+## 7. Diagnostic check of the residuals from the SARIMA models being fitted.
+
+### Autofit
+
+```{r}
+# autofit
+test(birth_bestmodel$residuals)
+confint(birth_bestmodel)
+```
+
+### Fit 1
+
+```{r}
+# SARIMA (7,1,1)x(1,1,1)12
+test(birth_fit1$residuals)
+confint(birth_fit1)
+```
+
+### Fit 2
+
+```{r}
+# SARIMA (14,1,1)x(2,1,1)12
+test(birth_fit2$residuals)
+confint(birth_fit2)
+```
+
+### Fit 3
+
+```{r}
+# SARIMA (24,1,1)x(2,1,1)12
+test(birth_fit3$residuals)
+confint(birth_fit3)
+```
+
+### Fit 4
+
+```{r}
+# SARIMA (5,1,5)x(1,1,2)12
+test(birth_fit4$residuals)
+confint(birth_fit4)
+```
+
+### Fit 5
+
+```{r}
+# SARIMA (0,1,2)x(1,1,2)12
+test(birth_fit5$residuals)
+confint(birth_fit5)
+```
+
+## 8. Select a final SARIMA model and type its equation.
+
+```{r}
+# Comparison
+AIC.values = c(
+  autofit = birth_bestmodel$aic,
+  fit1 = birth_fit1$aic,
+  fit2 = birth_fit2$aic,
+  fit3 = birth_fit3$aic,
+  fit4 = birth_fit4$aic,
+  fit5 = birth_fit5$aic
+)
+AIC.values
+```
+
+-   The best model is the auto-fit model.
+
+-   SARIMA (0,1,2)x(1,1,1)12
+
+    $$
+    (B)(1-0.1018B^{12})(1-B)X_t= (1 + 0.3984B + 0.1632B^2)(1+0.8434^{12})(1-B)Z_t \quad Z_t \sim WN(0, 46.1) 
+    $$
+
+## 9. Split data to two data sets: training (367 obs.) and testing (the most recent/last 6 obs.)
+
+```{r}
+birth_training = birth[1:367]
+```
+
+## 10. Fit a SARIMA model to the training series and forecast the next 6 observations.
+
+```{r}
+# SARIMA (1,1,1)x(1,1,1)12
+fit1_forecast = arima(birth_training,
+            order = c(7,1,1),
+            seasonal = list(order=c(1,1,1),period=12))
+
+# SARIMA (1,1,1)x(2,1,1)12
+fit2_forecast  = arima(birth_training,
+            order = c(14,1,1),
+            seasonal = list(order=c(2,1,1),period=12))
+
+# SARIMA (1,1,1)x(2,1,1)12
+fit3_forecast  = arima(birth_training,
+            order = c(24,1,1),
+            seasonal = list(order=c(2,1,1),period=12))
+
+# SARIMA (1,1,1)x(2,1,1)12
+fit4_forecast  = arima(birth_training,
+            order = c(5,1,5),
+            seasonal = list(order=c(1,1,2),period=12))
+
+# SARIMA (1,1,1)x(2,1,1)12
+fit5_forecast  = arima(birth_training,
+            order = c(0,1,2),
+            seasonal = list(order=c(1,1,2),period=12))
+
+# Auto fit
+bestmodel_forecast  = auto.arima(birth_training, trace= T, seasonal = T)
+```
+
+```{r}
+f1 = aTSA::forecast(object = fit1_forecast,lead = 6,output = FALSE)
+f2  = aTSA::forecast(object = fit2_forecast,lead = 6,output = FALSE)
+f3  = aTSA::forecast(object = fit3_forecast,lead = 6,output = FALSE)
+f4  = aTSA::forecast(object = fit4_forecast,lead = 6,output = FALSE)
+f5  = aTSA::forecast(object = fit5_forecast,lead = 6,output = FALSE)
+
+```
+
+## 11. Run ARAR and Holt-Winters algorithms to predict the same number of observations.
+
+```{r}
+# ARAR
+arar.prd = arar(birth_training, h=6)
+```
+
+```{r}
+# Holt-Winters
+HWmodel = HoltWinters(ts(birth_training,start=1,frequency = 12),seasonal = "mult")
+HW.prd =forecast::forecast(HWmodel,6)
+```
+
+## 12. Compare the models in terms of MAPE.
+
+```{r, warning=FALSE}
+library(Metrics)
+MAPE1 = mape(birth[368:373],f1[,2])*100
+MAPE2 = mape(birth[368:373],f2[,2])*100
+MAPE3 = mape(birth[368:373],f3[,2])*100
+MAPE4 = mape(birth[368:373],f4[,2])*100
+MAPE5 = mape(birth[368:373],f5[,2])*100
+MAPEarar = mape(birth[368:373],arar.prd$pred)*100
+MAPEhw = mape(birth[368:373],HW.prd$mean)*100
+
+
+MAPEs = c(fit1_mape = MAPE1,
+          fit2_mape = MAPE2,
+          fit3_mape = MAPE3,
+          fit4_mape = MAPE4,
+          fit5_mape = MAPE5,
+          arar.model = MAPEarar,
+          hw.model = MAPEhw)
+MAPEs
+```
+
+-   Fit5 (0,1,2)x(1,1,2)x12 has the lowest MAPE (Mean Absolute Percent Error) of 2.011.
