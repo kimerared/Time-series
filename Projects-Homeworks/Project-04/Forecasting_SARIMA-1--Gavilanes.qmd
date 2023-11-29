@@ -33,7 +33,7 @@ pacf(birth, lag.max = 50)
 plota(birth)
 ```
 
--   There is an an upward trend at the begining, but it has a correction (downward trend) after 1960.
+-   There is an an upward trend at the beginning, but it has a correction (downward trend) after 1960.
 
 -   There is seasonality of 12.
 
