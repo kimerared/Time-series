@@ -49,6 +49,27 @@ $$
 
 3.  Assume $\theta=0.47$ compute the ACVF and ACF.
 
+```{r}
+theta = 0.47
+sigma2 = 1
+# MA(1)
+# ACVF
+acvf0 = (1+theta^2)*sigma2
+acvf1 = theta*sigma2
+
+# Print vector format
+ACVF = c(acvf0, acvf1)
+ACVF
+
+# ACF
+acf0 = 1
+acf1 = theta / (1+theta^2)
+
+# Print vector format
+ACF = c(acf0, acf1)
+ACF
+```
+
 ## Problem B: Application of CI
 
 Consider $X_t$ is a time series AR(1) with $\phi=0.5$ and $\sigma_{Z_t}=2$. Let's assume we have a sample $\{X_1,\dots,X_{50}\}$. The sample mean is 1.5 and $\hat{\rho}(1)$ (ACF at lag 1) is equal to $0.63$.
@@ -61,7 +82,20 @@ $$
 
 1.  Compute the approximate $95\%$ confidence interval for the process mean $\mu_{X_t}$.
 
+```{r}
+xbar = 1.5
+phi = 0.5
+sigmaZt = 2
+n = 50
+
+lb = xbar - 1.96*sigmaZt / (sqrt(n)*1-phi)
+ub = xbar + 1.96*sigmaZt / (sqrt(n)*1-phi)
+c(lb, ub)
+```
+
 2.  Are the data compatible with the hypothesis that $\mu=0$?
+
+-   Data is not compatible with the mean hypothesis equal 0.
 
 The approximate $95\%$ confidence interval for the autocorrelation coefficient at Lag 1, $\rho(1)$, of AR(1) process is given by:
 
@@ -77,7 +111,29 @@ $$
 
 1.  Compute the approximate $95\%$ confidence interval for the autocorrelation coefficient at Lag 1, $\rho(1)$.
 
+```{r}
+rhohat = 0.63
+n = 50
+phi = 0.5
+w11 = 1-phi^2
+
+# CI 95%
+lb1 = rhohat - 1.96* (sqrt(w11/n))
+ub1 = rhohat + 1.96* (sqrt(w11/n))
+c(lb1, ub1)
+```
+
 2.  Assume we observed $X_{50}=10$. Find the best linear predictor of $X_{52}$
+
+```{r}
+# Prediction
+xbar = 1.5
+x50 = 10
+rho2 = phi^2 #AR(1): ACF at lag 2 = phi^h
+
+# Using the mean sample
+x52 = xbar + rho2*(x50 - xbar)
+```
 
 ## Problem C: ARMA(p,q) Modeling
 
