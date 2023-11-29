@@ -1,3 +1,7 @@
 When data has no trend nor Season-> ARMA
 When data has only trend-> ARIMA
 When Data has both Trend and Season -> SARIMA
+
+SARIMA Equation
+
+\phi(B)\Phi(B^s)(1-B^s)^D(1-B)^d X_t = \theta(B)\Theta(B^s) Z_t, \quad Z_t \sim WN(0,\sigma^2)
