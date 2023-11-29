@@ -215,20 +215,37 @@ colnames(lake_tb) <- c("year", "level")
 
 There is no seasonality. Not noticeable variance change, and downward trend.
 
+$$
+X_t = m_t + Y_t
+$$
+
 ## Trend Estimation: Moving Averages
 
 ```{r}
 #Estimate the Trend and/or Season being considered using Moving Average Smoothing and Regression, if applicable
 
 lake_tb %>% 
-  mutate(ma.trend10 = smooth.ma(level, 10),
-         ma.trend30 = smooth.ma(level, 30)) %>% 
+  mutate(ma.trend1 = smooth.ma(level, 1),
+         ma.trend5 = smooth.ma(level, 5)) %>% 
   pivot_longer(cols=-year,
                names_to = "series",
                values_to = "level") %>% 
   group_by(series) %>% 
   autoplot(level)+
   labs(y="Water Level", x="Time", title = "Smoothing Moving Average")
+```
+
+```{r}
+# Estimate Trend
+m = smooth.ma(lake, 3) #moving average filter
+m2 = smooth.ma(lake, 5) #moving average filter
+mreg = trend(lake, 1) #polynomial regression
+plot(lake, type="l",
+     ylab = "Yearly Level of Lake Huron",
+     xlab = "Time")
+lines(m, col="magenta")
+lines(m2, col="blue")
+lines(mreg, col="green")
 ```
 
 ## Trend Estimation: Regression
