@@ -24,15 +24,16 @@ The take-home project exam will involve analyzing time series data. You are allo
 
 # Exam
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 #install.packages("astsa")
 # Load packages
-library(itsmr)
+library(itsmr) # load
+library(astsa) # load
 library(tidyverse)
 library(tsibble)
 library(feasts)
 library(car)
-library(astsa)
+
 ```
 
 ## Problem A: Application of ACVF and ACF
@@ -133,6 +134,7 @@ rho2 = phi^2 #AR(1): ACF at lag 2 = phi^h
 
 # Using the mean sample
 x52 = xbar + rho2*(x50 - xbar)
+x52
 ```
 
 ## Problem C: ARMA(p,q) Modeling
@@ -156,6 +158,11 @@ In this problem we will find an ARMA(p,q) model to the Monthly price of a pound 
     X_t = m_t + Y_t
     $$
 
+    ```{r}
+    # Data model
+    data.model = c("trend", 1) #regression
+    ```
+
     To deal with the variance change, we need to perform a transformation.
 
     ```{r}
@@ -168,15 +175,8 @@ In this problem we will find an ARMA(p,q) model to the Monthly price of a pound 
 3.  Estimate and Eliminate the components, name the resulting residuals $r1$ (you pick a technique to estimate).
 
     ```{r}
-    m = smooth.ma(chicken, 1) # moving average filter
-    mreg = trend(chicken, 1) # polynomial regression
-    plot(chicken, type = "l")
-
-    # Find residuals
-    plotc(log(chicken))
-    # data model
-    chick_model = c("log", "trend", 1)
-    r1 = Resid(chicken, chick_model)
+    # Eliminate components
+    r1 = Resid(chicken, M=data.model)
     ```
 
 4.  Eliminate the components using the differencing operator $\nabla$, name the resulting $r2$.
@@ -187,7 +187,7 @@ In this problem we will find an ARMA(p,q) model to the Monthly price of a pound 
 
     ```{r}
     # Eliminate components using Differencing Operator
-    chick_diff = c("log", "diff", 1)
+    chick_diff = c("diff", 1) # differencing operator
     r2 = Resid(chicken, chick_diff)
 
     ```
@@ -195,23 +195,25 @@ In this problem we will find an ARMA(p,q) model to the Monthly price of a pound 
 5.  Examine the ACF of $r2$. Comment and consider changing your data model, if needed? If you decide to change your data model, then recompute $r1$ and $r2$.
 
     ```{r}
-    plota(r2)
+    acf(r2, lag.max = 50)
     ```
 
-    The ACF still has some significant values showing on the graph. Thus, the model is not stationary. I will modify the first model.
+    The ACF still has some significant values showing on the graph. Thus, the model is not stationary.
 
     ## Second Model
 
-    In this case, I will not make any data transformation since I assume that there is no variance change. However, this model is even worse than the first one.
+    In this case, I will reconsider the model because there is seasonality.
+
+    Recomputing r1, and r2.
 
     ```{r}
     # data model
-    chick_model = c("trend", 1)
-    r3 = Resid(chicken, chick_model)
+    chick_model = c("trend", 1, "season", 12)
+    r1 = Resid(chicken, chick_model)
 
     # Eliminate components using Differencing Operator
-    chick_diff = c("diff", 1)
-    r4 = Resid(chicken, chick_diff)
+    chick_diff = c("diff", 1, "diff", 12)
+    r2 = Resid(chicken, chick_diff)
     ```
 
 6.  Test IID hypothesis for the residuals $r1$ and $r2$. Comment.
@@ -221,13 +223,6 @@ In this problem we will find an ARMA(p,q) model to the Monthly price of a pound 
     test(r1)
     # r2 IID Test
     test(r2)
-    ```
-
-    ```{r}
-    # r1 IID test
-    test(r3)
-    # r2 IID Test
-    test(r4)
     ```
 
     After performing the IID hypothesis test, I can conclude the following:
@@ -243,8 +238,16 @@ In this problem we will find an ARMA(p,q) model to the Monthly price of a pound 
     q=0,1,2...
 
     ```{r}
-    pacf(r2)
-    acf(r2)
+    # Model 1
+    arma54 = autofit(r2)
+    # phi = AR
+    # theta = MA
+
+    # Specify
+    arma54.model = specify(ar=arma54$phi,
+                           ma = arma54$theta,
+                           sigma2 = arma54$sigma2)
+    test(Resid(x=r2, a=arma54.model))
 
     ```
 
@@ -252,19 +255,15 @@ In this problem we will find an ARMA(p,q) model to the Monthly price of a pound 
 
     ## Model-01
 
-    $$
-    Y_t = 0.72Y_{t-1} + Z_t
-    $$
-
-    AICC = -1188.15
-
-    Reject the IID hypothesis for model 1.
+    ```{r}
+    plota(r2)
+    ```
 
     ```{r}
-    model_1=arma(r2, p=1, q=0)
+    model_1=arma(r2, p=2, q=0)
     arma_model_01 = specify(ar=model_1$phi, ma = model_1$theta, sigma2 = model_1$sigma2)
 
-    arma_resid_01 = Resid(r2, M= NULL, a=arma_model_01)
+    arma_resid_01 = Resid(r2, a=arma_model_01)
     test(arma_resid_01)
 
     ```
@@ -288,18 +287,31 @@ In this problem we will find an ARMA(p,q) model to the Monthly price of a pound 
     ## Model-03
 
     ```{r}
-    model_3=arma(r2, p=6, q=2)
+    model_3=arma(r2, p=2, q=10)# AICC = 363.8087
+    arma_model_03 = specify(ar=model_3$phi, ma = model_3$theta, sigma2 = model_3$sigma2)
+
+    arma_resid_03 = Resid(r2, a=arma_model_03)
+    test(arma_resid_03)
+    ```
+
+    ## Model-04
+
+    ```{r}
+    model_4=arma(r2, p=12, q=1) #AICC = 382.1924
+    arma_model_04 = specify(ar=model_4$phi, ma = model_4$theta, sigma2 = model_4$sigma2)
+
+    arma_resid_04 = Resid(r2, a=arma_model_04)
+    test(arma_resid_04)
     ```
 
 9.  Provide the final equation of the best adequate model.
 
-```{r}
-modelbest = autofit(r2, p=0:2, q=0:12)
+## Model 3 equation:
 
-arma_model = specify(ar=modelbest$phi, ma = modelbest$theta, sigma2 = modelbest$sigma2)
+$$
+(1 - 0.0884B - 0.6035B^2) \nabla \nabla_{12} X_t =
+$$
 
-arma_resid = Resid(r2, M= NULL, a=arma_model)
-test(r2)
-```
-
-I was not able to find a good model. Need more time for further analysis.
+$$
+(1 + 0.94B -0.09B^2 -0.69B^3 -0.66B^4 -0.10B^5  0.59B^6  0.55B^7 -0.08B^8 -0.70B^9 -0.74B^{10})Z_t
+$$
