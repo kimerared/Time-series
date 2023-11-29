@@ -326,3 +326,27 @@ test(r.diff)
 ```
 
 Failed to reject the IID Null Hypothesis at $\alpha = 0.05$ when using differencing operator. No further analysis is required.
+
+## Fit ARMA(p,q) model to 'lake' data
+
+```{r, warning=FALSE}
+armaauto = autofit(R) #AR(p)=2 as best model from phi
+arma21 = arma(R, p=2, q=1) #ARMA(2,1)
+ar1 = arma(R, p=1, q=0)#ARMA(1,0) = AR(1)
+```
+
+```{r}
+#IID test residual of the model
+# Specify phi, theta, sigma
+arma.model = specify(ar = ar1$phi,
+                    ma = ar1$theta,
+                    sigma2 = ar1$sigma2)
+arma.R = Resid(x=lake, M=data.model.diff, a=arma.model)
+test(arma.R)
+```
+
+The model equation using lm(formula = lake \~ c(1:98)):
+
+$$
+10.2020 - 0.0242t + 0.7275X_{t-1} \sim WN(0,0.4782)
+$$
