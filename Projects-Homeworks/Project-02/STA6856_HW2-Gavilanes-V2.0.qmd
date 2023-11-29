@@ -276,6 +276,7 @@ No seasonality
 ## IID Hypothesis Test
 
 ```{r}
+# Alternative method
 estimate.trend = trend(lake_tb$level, 2)
 r_lake = lake_tb$level - estimate.trend
 test(r_lake)
@@ -317,4 +318,11 @@ residual.squared.lake = diff(log(lake_tb$level), lag=1, differences = 2)
 test(residual.squared.lake)
 ```
 
-Failed to reject the IID Null Hypothesis at $\alpha = 0.05$. No further analysis is required.
+```{r}
+# Better method
+data.model.diff = c("diff", 1)
+r.diff = Resid(lake, data.model.diff)
+test(r.diff)
+```
+
+Failed to reject the IID Null Hypothesis at $\alpha = 0.05$ when using differencing operator. No further analysis is required.
