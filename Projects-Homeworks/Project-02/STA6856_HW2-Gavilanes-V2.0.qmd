@@ -45,7 +45,7 @@ And perform the following:
 
 6.  Use the differencing operator to eliminate the Trend/Season components and redo steps 4 and 5.
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 # Load packages
 library(itsmr)
 library(tidyverse)
@@ -213,7 +213,7 @@ colnames(lake_tb) <- c("year", "level")
 
 ```
 
-There is no seasonality.
+There is no seasonality. Not noticeable variance change, and downward trend.
 
 ## Trend Estimation: Moving Averages
 
