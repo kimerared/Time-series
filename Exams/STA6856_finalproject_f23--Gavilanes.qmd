@@ -1,0 +1,623 @@
+---
+title: "STA 6856 Time Series"
+subtitle: "Final Exam"
+author: "Student Name"
+format: html
+self-contained: true
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+## Instructions
+
+The take-home project exam will involve analyzing time series data. You are allowed to use your notes, the lectures notes, and anything you find in the library or online, if that is properly acknowledged, but all your work must be your own. **Complete this examination honestly, without giving assistance to anyone or receiving it from anyone.**
+
+**⚠️ Late Submission are not accepted.**
+
+```{r, warning=FALSE, message=FALSE}
+library(datasets)
+library(itsmr)
+library(forecast)
+
+```
+
+# Problem A: Application of ACF (Estimation)
+
+1.  Find (show derivations) the autocovariance (ACVF) and the autocorrelation (ACF) functions of MA(1) time series model.
+
+2.  In this second part, we will study how the sample size (time series length) is associated with the estimation of $\theta$ for an MA(1) model. Use R to simulate 500 series of length n = {5, 25, 50, 75, 100, 150, 200, 500} of an MA(1) process with $\theta =0.6$ given by:
+
+$$
+X_t = 0.6Z_{t−1} + Z_t, \text{ where } Z_t ∼ W N (0, 1)
+$$
+
+2.1. Compute the estimate of $\rho(1)$ using `acf()` function for each series and sample size.
+
+```{r}
+theta = 0.6
+sigma2 = 1
+n = 8
+# ACF
+acf0 = 1
+acf1 = theta / (1+theta^2)
+
+# Print vector format
+ACF = c(acf0, acf1)
+ACF
+```
+
+2.2. Plot densities of the estimates using `geom_density` for each sample size all together in the plot.
+
+2.3. Give a box plot of the estimates using `geom_boxplot` for each sample size all together in the plot.
+
+2.4. Compute and provide in a table the mean and standard deviation of the estimates for each sample size.
+
+2.5. Use this simulation study to find the smallest sample size where the mean square error of the estimation $\sum (0.6-estimate)^2 / 500 < 0.001$; 500 is the number of simulation runs.
+
+# Problem B (Modeling and Forecasting)
+
+We are going to study the monthly deaths from Lung Diseases (bronchitis, emphysema and asthma) in the UK, from 1974 to 1979. There are three data sets: 1) `ldeaths` contains the total monthly deaths, 2) `mdeaths` has only males monthly deaths and 3) `fdeaths` has females monthly deaths. Note that ldeaths= fdeaths+ mdeaths.
+
+You can find these datasets in `datasets` package. The goal is to build a model for forecasting the monthly deaths from Lung Diseases in the UK. The following are the steps you should consider in your analysis:
+
+1.  Split each dataset to 2 datasets: i) The Training dataset will contain observations from 1974 to 1978 and ii) the Testing dataset will have the data of 1979.
+
+```{r}
+# 01- Monthly deaths
+# Training Split
+deaths_training <- window(ldeaths, start = c(1974, 1), end = c(1978, 12))
+
+# Creating a time series 
+death_training_ts <- ts(deaths_training, frequency = 12)
+
+
+# 02- Male deaths
+# Training Split
+male_training <- window(mdeaths, start = c(1974, 1), end = c(1978, 12))
+
+# Creating a time series 
+male_training_ts <- ts(male_training, frequency = 12)
+
+# 03- Female deaths
+# Training Split
+female_training <- window(fdeaths, start = c(1974, 1), end = c(1978, 12))
+
+# Creating a time series 
+female_training_ts <- ts(female_training, frequency = 12)
+
+
+```
+
+2.  Fit a time series model to the training `ldeaths` data set (Plot the data, ACF, and PACF. Describe and discuss the steps you followed), and write down the equation of the model.
+
+```{r}
+plot(ldeaths)
+plota(ldeaths)
+acf(ldeaths, lag.max = 40)
+pacf(ldeaths, lag.max = 40)
+```
+
+-   It seems that there is no trend.
+
+-   There is seasonality of 12.
+
+-   Overall, no drastic variance change, except in 1976. Further inspection is needed.
+
+    ```{r}
+    library(car)
+    # Variance change transformation
+    lambda = powerTransform(ldeaths)
+    lambda$roundlam
+
+    # Seasonality
+    deaths_season = season(ldeaths, d=12)
+    plotc(deaths_season)
+    ```
+
+## Test IID
+
+```{r}
+# Differencing Operator
+deaths_diff = c("log","diff", 12, "diff", 1)
+
+# IID hypothesis test
+deaths_r_diff = Resid(ldeaths, deaths_diff)
+test(deaths_r_diff)
+```
+
+-   Reject the IID null hypothesis. The time series is not stationary.
+
+## Stationary Hypothesis
+
+```{r, warning=FALSE, message=FALSE}
+library(aTSA)
+# Stationary Test
+adf.test(deaths_r_diff)
+```
+
+-   FTR the null hypothesis. The time series is stationary.
+
+-   No differencing is needed.
+
+### Based on the PACF
+
+P = 0, 1:4, 10
+
+p = 0,1
+
+### Based on the ACF
+
+q = 0, 1, 2, 4:8, 10:14
+
+Q = 0,1:3
+
+### Eliminate Season
+
+d = 0 (differencing non-seasonal)
+
+D = 1 (differencing seasonal)
+
+## Autofit - Deaths
+
+```{r}
+# Auto fit
+deaths_bestmodel = auto.arima(ldeaths, trace = T)
+#SARIMA (0,0,2)(2,1,0)12
+```
+
+```{r}
+# Fit 1
+deaths_fit1 = arima(ldeaths,
+             order = c(0,0,2),
+             seasonal = list(order=c(1,1,1), period=12))
+
+# Fit 2
+deaths_fit2 = arima(ldeaths,
+             order = c(0,0,2),
+             seasonal = list(order=c(1,1,3), period=12))
+
+# Fit 3
+deaths_fit3 = arima(ldeaths,
+             order = c(0,0,2),
+             seasonal = list(order=c(1,1,2), period=12))
+```
+
+## Check Residuals from SARIMA models
+
+```{r}
+# autofit
+test(deaths_bestmodel$residuals)
+confint(deaths_bestmodel)
+
+# Fit 1
+test(deaths_fit1$residuals)
+confint(deaths_fit1)
+
+# Fit 2
+test(deaths_fit2$residuals)
+confint(deaths_fit2)
+
+# Fit 3
+test(deaths_fit3$residuals)
+confint(deaths_fit3)
+```
+
+-   The best model is the SARIMA (0,0,2)(2,1,0)12
+
+-   The other fitted models did not pass the hypothesis test.
+
+$$
+(1+0.953B^{12}+0.502B^{24})(1-B^{12})log(X_t) = (1-0.184B+0.248B^2)(1-5.527B)Z_t \quad Z_t \sim WN(0,56263)
+$$
+
+3.  Fit a time series model to the training `mdeaths` data set Plot the data, ACF, and PACF. Describe and discuss the steps you followed), and write down the equation of the model.
+
+```{r}
+plot(mdeaths)
+plota(mdeaths)
+acf(mdeaths, lag.max = 40)
+pacf(mdeaths, lag.max = 40)
+```
+
+-   It seems that there is no trend.
+
+-   There is seasonality of 12.
+
+-   There is a variance change in 1976. Further inspection is needed.
+
+```{r}
+# Variance change transformation
+lambda = powerTransform(mdeaths)
+lambda$roundlam
+
+# Seasonality
+male_season = season(mdeaths, d=12)
+plotc(male_season)
+```
+
+## IID - Male
+
+```{r}
+# Differencing Operator
+male_diff = c("diff", 12, "diff", 1)
+
+# IID hypothesis test
+male_r_diff = Resid(mdeaths, male_diff)
+test(male_r_diff)
+```
+
+-   Reject the IID null hypothesis. The time series is not stationary.
+
+## Stationary Hypothesis - Male
+
+```{r}
+# Stationary Test
+adf.test(male_r_diff)
+```
+
+-   FTR the null hypothesis. The time series is stationary.
+
+-   No differencing is needed.
+
+### Based on the PACF - Male
+
+P = 0, 1:4, 10
+
+p = 0,1
+
+### Based on the ACF - Male
+
+q = 0, 1, 2, 4:8, 10:14
+
+Q = 0,1:3
+
+### Eliminate Season - Male
+
+d = 0 (differencing non-seasonal)
+
+D = 1 (differencing seasonal)
+
+## Autofit - Male
+
+```{r}
+# Auto fit
+male_bestmodel = auto.arima(mdeaths, trace = T)
+```
+
+```{r}
+# Fit 1
+male_fit1 = arima(mdeaths,
+             order = c(0,0,10),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 2
+male_fit2 = arima(mdeaths,
+             order = c(0,0,12),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 3
+male_fit3 = arima(mdeaths,
+             order = c(0,0,10),
+             seasonal = list(order=c(2,1,1), period=12))
+```
+
+## Test Residuals from Male SARIMA models
+
+```{r}
+# autofit
+test(male_bestmodel$residuals)
+confint(male_bestmodel)
+
+# Fit 1
+test(male_fit1$residuals)
+confint(male_fit1)
+
+# Fit 2
+test(male_fit2$residuals)
+confint(male_fit2)
+
+# Fit 3
+test(male_fit3$residuals)
+confint(male_fit3)
+```
+
+## Male Comparison
+
+```{r}
+# Comparison
+AIC.values = c(
+  m_automodel = male_bestmodel$aic,
+  male_fit1 = male_fit1$aic,
+  male_fit2 = male_fit2$aic,
+  male_fit3 = male_fit3$aic
+)
+AIC.values
+```
+
+-   The best model is: SARIMA(0,0,1)(2,1,0)12
+
+$$
+(1+1.0245B^{12}+0.512B^{24})(1-B^{12})log(X_t) = (1-0.3517B)(1+4.567B)Z_t \quad Z_t \sim WN(0, 29046)
+$$
+
+4.  Fit a time series model to the training `fdeaths` data set Plot the data, ACF, and PACF. Describe and discuss the steps you followed), and write down the equation of the model.
+
+```{r}
+plot(fdeaths)
+# ACF, PACF
+acf(fdeaths, lag.max = 80)
+pacf(fdeaths, lag.max = 50)
+plota(fdeaths)
+```
+
+-   It seems that there is no trend.
+
+-   There is seasonality of 12.
+
+-   Overall, no drastic variance change, except in 1976. Further inspection is needed.
+
+```{r}
+# Variance change transformation
+lambda = powerTransform(fdeaths)
+lambda$roundlam
+
+# Seasonality
+female_season = season(fdeaths, d=12)
+plotc(female_season)
+```
+
+## IID Test - Female
+
+```{r}
+# Differencing Operator
+female_diff = c("diff", 12, "diff", 1)
+
+# IID hypothesis test
+female_r_diff = Resid(fdeaths, female_diff)
+test(female_r_diff)
+```
+
+-   Reject the IID null hypothesis. The time series is not stationary.
+
+## Stationary Test - Female
+
+```{r}
+# Stationary Test
+adf.test(female_r_diff)
+```
+
+-   FTR the null hypothesis. The time series is stationary.
+
+-   No differencing is needed.
+
+### Based on the PACF - Female
+
+P = 0, 1:4, 10
+
+p = 0,1
+
+### Based on the ACF - Female
+
+q = 0, 1, 2, 4:8, 10:14
+
+Q = 0,1:3
+
+### Eliminate Season - Female
+
+d = 0 (differencing non-seasonal)
+
+D = 1 (differencing seasonal)
+
+## Autofit - Female
+
+```{r}
+# Auto fit
+female_bestmodel = auto.arima(fdeaths, trace = T)
+```
+
+## Fit Models - Female
+
+```{r}
+# Fit 1
+female_fit1 = arima(fdeaths,
+             order = c(0,0,10),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 2
+female_fit2 = arima(fdeaths,
+             order = c(0,0,12),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 3
+female_fit3 = arima(fdeaths,
+             order = c(0,0,11),
+             seasonal = list(order=c(2,1,1), period=12))
+```
+
+## Test Residuals from Female SARIMA models
+
+```{r}
+# autofit
+test(female_bestmodel$residuals)
+confint(female_bestmodel)
+
+# Fit 1
+test(female_fit1$residuals)
+confint(female_fit1)
+
+# Fit 2
+test(female_fit2$residuals)
+confint(female_fit2)
+
+# Fit 3
+test(female_fit3$residuals)
+confint(female_fit3)
+```
+
+## Female Comparison
+
+```{r}
+# Comparison
+AIC.values = c(
+  f_automodel = female_bestmodel$aic,
+  female_fit1 = female_fit1$aic,
+  female_fit2 = female_fit2$aic,
+  female_fit3 = female_fit3$aic
+)
+AIC.values
+```
+
+-   The best model is: SARIMA(0,0,0)(2,1,0)12
+
+$$
+(1+0.872B^{12}+0.495B^{24})(1)log(X_t) = (1+0.964B)Z_t \quad Z_t \sim WN(0,5887)
+$$
+
+5.  Provide forecast points for a year ahead (12 observations) for the three datasets (totals, males, and females).
+
+## Total Deaths Forecast
+
+```{r}
+# AutoFit
+t_automodel_forecast  = auto.arima(death_training_ts, trace= T, seasonal = T)
+
+# Fit 1
+total_forecast_1 = arima(death_training_ts,
+             order = c(0,0,10),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 2
+total_forecast_2 = arima(death_training_ts,
+             order = c(0,0,12),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 3
+total_forecast_3 = arima(death_training_ts,
+             order = c(0,0,10),
+             seasonal = list(order=c(2,1,1), period=12))
+```
+
+```{r}
+best_total_forecast = arima(death_training_ts,
+             order = c(0,0,2),
+             seasonal = list(order=c(1,1,0), period=12))
+total.auto = aTSA::forecast(object = best_total_forecast,lead = 12, output = FALSE)
+```
+
+## Male Deaths Forecast
+
+```{r}
+# AutoFit
+m_automodel_forecast  = auto.arima(male_training_ts, trace= T, seasonal = T)
+
+# Fit 1
+male_forecast_1 = arima(female_training_ts,
+             order = c(0,0,10),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 2
+male_forecast_2 = arima(female_training_ts,
+             order = c(0,0,12),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 3
+male_forecast_3 = arima(female_training_ts,
+             order = c(0,0,10),
+             seasonal = list(order=c(2,1,1), period=12))
+```
+
+```{r}
+best_male_forecast = arima(male_training_ts,
+             order = c(0,0,2),
+             seasonal = list(order=c(1,1,0), period=12))
+m.auto = aTSA::forecast(object = best_male_forecast,lead = 12, output = FALSE)
+```
+
+```{r}
+m1  = aTSA::forecast(object = male_forecast_1,lead = 12,output = FALSE)
+m2  = aTSA::forecast(object = male_forecast_2,lead = 12,output = FALSE)
+m3  = aTSA::forecast(object = male_forecast_3,lead = 12,output = FALSE)
+```
+
+## Female Deaths Forecast
+
+```{r}
+# AutoFit
+f_automodel_forecast  = auto.arima(female_training_ts, trace= T, seasonal = T)
+
+# Fit 1
+female_forecast_1 = arima(female_training_ts,
+             order = c(0,0,10),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 2
+female_forecast_2 = arima(female_training_ts,
+             order = c(0,0,12),
+             seasonal = list(order=c(2,1,0), period=12))
+
+# Fit 3
+female_forecast_3 = arima(female_training_ts,
+             order = c(0,0,11),
+             seasonal = list(order=c(2,1,1), period=12))
+```
+
+```{r}
+best_female_forecast = arima(female_training_ts,
+             order = c(0,0,0),
+             seasonal = list(order=c(1,1,0), period=12))
+f.auto = aTSA::forecast(object = best_female_forecast,lead = 12, output = FALSE)
+```
+
+```{r}
+f1  = aTSA::forecast(object = female_forecast_1,lead = 12,output = FALSE)
+f2  = aTSA::forecast(object = female_forecast_2,lead = 12,output = FALSE)
+f3  = aTSA::forecast(object = female_forecast_3,lead = 12,output = FALSE)
+
+```
+
+6.  Fit ARAR and Holt-Winters models to the three time series data (ldeaths, fdeaths, and mdeaths)
+
+```{r}
+# ARAR
+# total
+#male
+arar.total = arar(death_training_ts, h=12)
+#male
+arar.male = arar(male_training_ts, h=12)
+# female
+arar.female = arar(female_training_ts, h=12)
+```
+
+```{r}
+# Holt-Winters
+# total
+total_HWmodel = HoltWinters(death_training_ts,seasonal = "mult")
+HW.prd =forecast::forecast(total_HWmodel,12)
+# male
+m_HWmodel = HoltWinters(male_training_ts,seasonal = "mult")
+HW.prd =forecast::forecast(m_HWmodel,12)
+# female
+f_HWmodel = HoltWinters(female_training_ts,seasonal = "mult")
+HW.prd =forecast::forecast(f_HWmodel,12)
+```
+
+7.  Combine the forecasts of male and female deaths. Let's name it CombinedForecasting= MaleForecasts+ FemaleForecasts. This CombinedForecasting could be used to forecast the total monthly deaths.
+
+```{r, warning=FALSE, message=FALSE}
+library(Metrics)
+CombinedForecast = m.auto + f.auto
+```
+
+8.  Compare the forecasting performance of the CombinedForecast, the OneModelForecasts (using the model on `ldeaths`) and fill out the below table. Comments on the results of this analysis and the merit of combined forecasts.
+
+| Model                                                                                                          | MAPE % |
+|--------------------------------|----------------------------------------|
+| CombinedForecasts - SARIMA                                                                                     |        |
+| OneModelForecasts - SARIMA                                                                                     |        |
+| CombinedForecasts - ARAR                                                                                       |        |
+| OneModelForecasts - ARAR                                                                                       |        |
+| CombinedForecasts - HW                                                                                         |        |
+| OneModelForecasts - HW                                                                                         |        |
+| All models Combined (Average OneModelForecasts - SARIMA, OneModelForecasts - ARAR, and OneModelForecasts - HW) |        |
