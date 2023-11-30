@@ -613,7 +613,7 @@ CombinedForecast = m.auto + f.auto
 8.  Compare the forecasting performance of the CombinedForecast, the OneModelForecasts (using the model on `ldeaths`) and fill out the below table. Comments on the results of this analysis and the merit of combined forecasts.
 
 | Model                                                                                                          | MAPE % |
-|--------------------------------|----------------------------------------|
+|----------------------------------------------------------------------------------------------------------------|--------|
 | CombinedForecasts - SARIMA                                                                                     |        |
 | OneModelForecasts - SARIMA                                                                                     |        |
 | CombinedForecasts - ARAR                                                                                       |        |
